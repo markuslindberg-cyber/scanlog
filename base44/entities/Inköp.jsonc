@@ -1,0 +1,29 @@
+{
+  "name": "Ink\u00f6p",
+  "type": "object",
+  "properties": {
+    "artikel_id": {
+      "type": "string",
+      "description": "Referens till Artikel"
+    },
+    "datum": {
+      "type": "string",
+      "format": "date",
+      "description": "Ink\u00f6psdatum"
+    },
+    "antal": {
+      "type": "integer",
+      "description": "Antal ink\u00f6pta"
+    },
+    "pris": {
+      "type": "number",
+      "description": "Pris per enhet"
+    }
+  },
+  "required": [
+    "artikel_id",
+    "datum",
+    "antal",
+    "pris"
+  ]
+}
