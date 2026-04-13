@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, AlertTriangle, Plus, Upload, FileDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
 
 export default function Lager() {
+  const navigate = useNavigate();
   const [artiklar, setArtiklar] = useState([]);
   const [uttag, setUttag] = useState([]);
   const [search, setSearch] = useState('');
@@ -136,7 +138,25 @@ export default function Lager() {
     return artikel.antal_inköpta - totalUttag;
   };
 
-  const filtered = artiklar.filter(a =>
+  const groupedByStreckkod = {};
+  artiklar.forEach(a => {
+    if (!groupedByStreckkod[a.streckkod]) {
+      groupedByStreckkod[a.streckkod] = [];
+    }
+    groupedByStreckkod[a.streckkod].push(a);
+  });
+
+  const unikArtiklar = Object.values(groupedByStreckkod).map(group => {
+    const huvudArtikel = group[0];
+    const totalInköpt = group.reduce((sum, a) => sum + a.antal_inköpta, 0);
+    return {
+      ...huvudArtikel,
+      antal_inköpta: totalInköpt,
+      grupp: group
+    };
+  });
+
+  const filtered = unikArtiklar.filter(a =>
     a.benämning.toLowerCase().includes(search.toLowerCase()) ||
     a.streckkod.includes(search)
   );
@@ -166,6 +186,10 @@ export default function Lager() {
     if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
+
+  const handleRowClick = (streckkod) => {
+    navigate(`/artikel/${streckkod}`);
+  };
 
   const tomma = filtered.filter(a => calculateSaldo(a) === 0).length;
   const lågtSaldo = filtered.filter(a => {
@@ -293,7 +317,11 @@ export default function Lager() {
                 }
 
                 return (
-                  <tr key={artikel.id} className={saldoBg}>
+                  <tr
+                    key={artikel.id}
+                    className={`${saldoBg} cursor-pointer hover:bg-blue-50 transition-colors`}
+                    onClick={() => handleRowClick(artikel.streckkod)}
+                  >
                     <td className="px-4 py-3">
                       <p className="font-medium">{artikel.benämning}</p>
                     </td>

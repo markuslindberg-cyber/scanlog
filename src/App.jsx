@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Layout from './components/Layout';
 import UttagForm from './pages/UttagForm';
 import Lager from './pages/Lager';
+import ArtikelDetaljer from './pages/ArtikelDetaljer';
 import KostnadPerKund from './pages/KostnadPerKund';
 import Inventering from './pages/Inventering';
 import Demo from './pages/Demo';
@@ -43,6 +44,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<UttagForm />} />
         <Route path="/uttag" element={<UttagForm />} />
         <Route path="/lager" element={<Lager />} />
+        <Route path="/artikel/:streckkod" element={<ArtikelDetaljer />} />
         <Route path="/kostnad" element={<KostnadPerKund />} />
         <Route path="/inventering" element={<Inventering />} />
         <Route path="/kunder" element={<KundHantering />} />
