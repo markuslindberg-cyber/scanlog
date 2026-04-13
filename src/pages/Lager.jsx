@@ -13,6 +13,7 @@ export default function Lager() {
   const [showDialog, setShowDialog] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const uttagFileInputRef = useRef(null);
 
   const loadData = async () => {
     try {
@@ -73,6 +74,106 @@ export default function Lager() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
       fileInputRef.current.click();
+    }
+  };
+
+  const handleDownloadUttagTemplate = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const personnelList = await base44.entities.Personal.list();
+      const kundalList = await base44.entities.Kund.list();
+      const artiklarList = await base44.entities.Artikel.list();
+      
+      const personal = personnelList[0] || { id: 'PERSONAL_ID', namn: 'Exempel Personal' };
+      const kund = kundalList[0] || { id: 'KUND_ID', namn: 'Exempel Kund' };
+      const artikel = artiklarList[0] || { id: 'ARTIKEL_ID', benämning: 'Exempel Artikel', pris: 100 };
+      const monthStr = today.substring(0, 7);
+
+      const ws_data = [
+        ['datum', 'personal_id', 'kund_id', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
+        [today, personal.id, kund.id, 'ORD-001', artikel.id, 5, artikel.pris * 5, monthStr],
+        [today, personal.id, kund.id, 'ORD-002', artikel.id, 3, artikel.pris * 3, monthStr]
+      ];
+
+      const csv = ws_data.map(row => 
+        row.map(cell => {
+          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        }).join(',')
+      ).join('\n');
+
+      const encoder = new TextEncoder();
+      const csvBytes = encoder.encode(csv);
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'uttag_mall.csv';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Kunde inte ladda ned mall');
+    }
+  };
+
+  const handleUttagImportClick = () => {
+    if (uttagFileInputRef.current) {
+      uttagFileInputRef.current.value = '';
+      uttagFileInputRef.current.click();
+    }
+  };
+
+  const handleUttagUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      console.log('1. Laddar upp uttag-fil:', file.name);
+      const uploadResult = await base44.integrations.Core.UploadFile({ file });
+      console.log('2. Fil uppladdad:', uploadResult.file_url);
+      
+      const uttagSchema = {
+        type: 'object',
+        properties: {
+          datum: { type: 'string', format: 'date' },
+          personal_id: { type: 'string' },
+          kund_id: { type: 'string' },
+          ordernummer: { type: 'string' },
+          artikel_id: { type: 'string' },
+          antal: { type: 'integer' },
+          pris: { type: 'number' },
+          månad: { type: 'string' }
+        },
+        required: ['datum', 'personal_id', 'kund_id', 'artikel_id', 'antal', 'pris', 'månad']
+      };
+      console.log('3. Schema definierat');
+      
+      console.log('4. Extraherar data...');
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+        file_url: uploadResult.file_url,
+        json_schema: uttagSchema
+      });
+      console.log('5. Extraktion klar:', result);
+
+      if (result.status === 'success' && Array.isArray(result.output)) {
+        console.log('6. Skapar ', result.output.length, ' uttag');
+        await base44.entities.Uttag.bulkCreate(result.output);
+        toast.success(`${result.output.length} uttag importerade!`);
+        loadData();
+      } else {
+        console.error('5b. Extraktion misslyckades:', result);
+        toast.error(result.details || 'Kunde inte parsa filen');
+      }
+    } catch (error) {
+      console.error('Importfel:', error);
+      toast.error('Importfel: ' + error.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -150,16 +251,16 @@ export default function Lager() {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">📦 Lager</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
-            <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
+            <FileDown className="w-4 h-4 mr-2" /> Mall artiklar
           </Button>
           <Button 
             onClick={handleImportClick}
             disabled={uploading}
             className="bg-green-600 hover:bg-green-700"
           >
-            <Upload className="w-4 h-4 mr-2" /> Importera Excel
+            <Upload className="w-4 h-4 mr-2" /> Importera artiklar
           </Button>
           <input
             ref={fileInputRef}
@@ -168,7 +269,24 @@ export default function Lager() {
             onChange={handleExcelUpload}
             className="hidden"
           />
-          <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleDownloadUttagTemplate} className="bg-blue-600 hover:bg-blue-700">
+            <FileDown className="w-4 h-4 mr-2" /> Mall uttag
+          </Button>
+          <Button 
+            onClick={handleUttagImportClick}
+            disabled={uploading}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Importera uttag
+          </Button>
+          <input
+            ref={uttagFileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleUttagUpload}
+            className="hidden"
+          />
+          <Button onClick={() => setShowDialog(true)} className="bg-teal-600 hover:bg-teal-700">
             <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
           </Button>
         </div>
