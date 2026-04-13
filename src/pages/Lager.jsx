@@ -62,8 +62,10 @@ export default function Lager() {
   };
 
   const handleImportClick = () => {
-    fileInputRef.current.value = '';
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleExcelUpload = async (e) => {
