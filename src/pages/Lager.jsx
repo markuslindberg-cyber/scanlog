@@ -126,7 +126,7 @@ export default function Lager() {
             </Button>
             <input
               type="file"
-              accept=".xlsx,.xls"
+              accept=".csv,.xlsx,.xls"
               onChange={handleExcelUpload}
               disabled={uploading}
               className="hidden"
