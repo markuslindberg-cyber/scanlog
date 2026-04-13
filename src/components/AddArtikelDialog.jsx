@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { X, Info } from 'lucide-react';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
+  const [artiklar, setArtiklar] = useState([]);
   const [form, setForm] = useState({
     benämning: '',
     artikelnummer: '',
@@ -17,11 +18,27 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
     lagertröskelvärde: '10'
   });
 
+  useEffect(() => {
+    const loadArtiklar = async () => {
+      const data = await base44.entities.Artikel.list();
+      setArtiklar(data);
+    };
+    if (isOpen) loadArtiklar();
+  }, [isOpen]);
+
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    const newForm = { ...form, [name]: value };
+    
+    // Auto-fill lagertröskelvärde from existing artikel with same streckkod
+    if (name === 'streckkod') {
+      const existing = artiklar.find(a => a.streckkod === value);
+      if (existing) {
+        newForm.lagertröskelvärde = String(existing.lagertröskelvärde || 10);
+      }
+    }
+    
+    setForm(newForm);
   };
 
   const handleSubmit = async (e) => {
