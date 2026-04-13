@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, AlertTriangle, Plus, Upload, FileDown } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Plus, Upload, FileDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
@@ -12,6 +12,8 @@ export default function Lager() {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [sortBy, setSortBy] = useState('benämning');
+  const [sortOrder, setSortOrder] = useState('asc');
   const fileInputRef = useRef(null);
 
   const loadData = async () => {
@@ -139,6 +141,32 @@ export default function Lager() {
     a.streckkod.includes(search)
   );
 
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const sorted = [...filtered].sort((a, b) => {
+    let aVal = a[sortBy];
+    let bVal = b[sortBy];
+    
+    if (sortBy === 'saldo') {
+      aVal = calculateSaldo(a);
+      bVal = calculateSaldo(b);
+    } else if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    
+    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   const tomma = filtered.filter(a => calculateSaldo(a) === 0).length;
   const lågtSaldo = filtered.filter(a => {
     const saldo = calculateSaldo(a);
@@ -214,16 +242,41 @@ export default function Lager() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Artikel</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Streckkod</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold">Pris</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold">Inköpt</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('benämning')}>
+                  <div className="flex items-center gap-2">
+                    Artikel
+                    {sortBy === 'benämning' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('streckkod')}>
+                  <div className="flex items-center gap-2">
+                    Streckkod
+                    {sortBy === 'streckkod' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('pris')}>
+                  <div className="flex items-center justify-end gap-2">
+                    Pris
+                    {sortBy === 'pris' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('antal_inköpta')}>
+                  <div className="flex items-center justify-end gap-2">
+                    Inköpt
+                    {sortBy === 'antal_inköpta' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                  </div>
+                </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold">Uttag</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold">Saldo</th>
+                <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('saldo')}>
+                  <div className="flex items-center justify-end gap-2">
+                    Saldo
+                    {sortBy === 'saldo' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filtered.map(artikel => {
+              {sorted.map(artikel => {
                 const saldo = calculateSaldo(artikel);
                 const totalUttag = uttag
                   .filter(u => u.artikel_id === artikel.id)
