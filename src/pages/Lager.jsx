@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, AlertTriangle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
 
 export default function Lager() {
@@ -9,22 +10,24 @@ export default function Lager() {
   const [uttag, setUttag] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showDialog, setShowDialog] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const [artiklarData, uttagData] = await Promise.all([
+        base44.entities.Artikel.list(),
+        base44.entities.Uttag.list()
+      ]);
+      setArtiklar(artiklarData);
+      setUttag(uttagData);
+    } catch (error) {
+      toast.error('Kunde inte ladda lagerdata');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [artiklarData, uttagData] = await Promise.all([
-          base44.entities.Artikel.list(),
-          base44.entities.Uttag.list()
-        ]);
-        setArtiklar(artiklarData);
-        setUttag(uttagData);
-      } catch (error) {
-        toast.error('Kunde inte ladda lagerdata');
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
 
@@ -52,10 +55,19 @@ export default function Lager() {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">📦 Lager</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
           <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
         </Button>
       </div>
+
+      <AddArtikelDialog
+        isOpen={showDialog}
+        onClose={() => setShowDialog(false)}
+        onSuccess={() => {
+          setShowDialog(false);
+          loadData();
+        }}
+      />
 
       <div className="bg-white rounded-lg p-4 border border-gray-200">
         <input
