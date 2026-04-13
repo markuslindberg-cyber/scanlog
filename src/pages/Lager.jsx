@@ -215,6 +215,7 @@ export default function Lager() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Artikel</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Streckkod</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold">Pris</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold">Inköpt</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold">Uttag</th>
@@ -241,11 +242,9 @@ export default function Lager() {
                 return (
                   <tr key={artikel.id} className={saldoBg}>
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="font-medium">{artikel.benämning}</p>
-                        <p className="text-sm text-gray-600">{artikel.streckkod}</p>
-                      </div>
+                      <p className="font-medium">{artikel.benämning}</p>
                     </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
                     <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
                     <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
                     <td className="px-4 py-3 text-right">{totalUttag}</td>
