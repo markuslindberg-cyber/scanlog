@@ -68,10 +68,10 @@ export default function Lager() {
 
     setUploading(true);
     try {
-      const fileUrl = await base44.integrations.Core.UploadFile({ file });
+      const uploadResult = await base44.integrations.Core.UploadFile({ file });
       const schema = await base44.entities.Artikel.schema();
       const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
-        file_url: fileUrl.file_url,
+        file_url: uploadResult.file_url,
         json_schema: { type: 'object', properties: schema.properties, required: schema.required }
       });
 
@@ -80,7 +80,7 @@ export default function Lager() {
         toast.success(`${result.output.length} artiklar importerade!`);
         loadData();
       } else {
-        toast.error('Kunde inte parsa Excel-filen');
+        toast.error(result.details || 'Kunde inte parsa filen');
       }
     } catch (error) {
       toast.error('Importfel: ' + error.message);
