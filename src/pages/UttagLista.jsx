@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
+import { Download, Calendar, ArrowUp, ArrowDown, Upload, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -13,26 +13,29 @@ export default function UttagLista() {
   const [sortBy, setSortBy] = useState('datum');
   const [sortOrder, setSortOrder] = useState('desc');
   const [filterPeriod, setFilterPeriod] = useState(new Date().toISOString().slice(0, 7));
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const loadData = async () => {
+    try {
+      const [uttagData, personalData, kunderData, artiklarData] = await Promise.all([
+        base44.entities.Uttag.list(),
+        base44.entities.Personal.list(),
+        base44.entities.Kund.list(),
+        base44.entities.Artikel.list()
+      ]);
+      setUttag(uttagData);
+      setPersonal(personalData);
+      setKunder(kunderData);
+      setArtiklar(artiklarData);
+    } catch (error) {
+      toast.error('Kunde inte ladda uttag');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [uttagData, personalData, kunderData, artiklarData] = await Promise.all([
-          base44.entities.Uttag.list(),
-          base44.entities.Personal.list(),
-          base44.entities.Kund.list(),
-          base44.entities.Artikel.list()
-        ]);
-        setUttag(uttagData);
-        setPersonal(personalData);
-        setKunder(kunderData);
-        setArtiklar(artiklarData);
-      } catch (error) {
-        toast.error('Kunde inte ladda uttag');
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
 
@@ -62,6 +65,89 @@ export default function UttagLista() {
     if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const ws_data = [
+        ['datum', 'personal_id', 'kund_id', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
+        [today, personal[0]?.id || '', kunder[0]?.id || '', 'ORD-001', artiklar[0]?.id || '', 10, 100, today.slice(0, 7)]
+      ];
+
+      const csv = ws_data.map(row => 
+        row.map(cell => {
+          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        }).join(',')
+      ).join('\n');
+
+      const encoder = new TextEncoder();
+      const csvBytes = encoder.encode(csv);
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'uttag_mall.csv';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Kunde inte ladda ned mall');
+    }
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const uploadResult = await base44.integrations.Core.UploadFile({ file });
+      
+      const uttagSchema = {
+        type: 'object',
+        properties: {
+          datum: { type: 'string', format: 'date' },
+          personal_id: { type: 'string' },
+          kund_id: { type: 'string' },
+          ordernummer: { type: 'string' },
+          artikel_id: { type: 'string' },
+          antal: { type: 'integer' },
+          pris: { type: 'number' },
+          månad: { type: 'string' }
+        },
+        required: ['datum', 'personal_id', 'kund_id', 'artikel_id', 'antal', 'pris', 'månad']
+      };
+      
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+        file_url: uploadResult.file_url,
+        json_schema: uttagSchema
+      });
+
+      if (result.status === 'success' && Array.isArray(result.output)) {
+        const validUttag = result.output.filter(u => u.antal > 0);
+        await base44.entities.Uttag.bulkCreate(validUttag);
+        toast.success(`${result.output.length} uttag importerade!`);
+        loadData();
+      } else {
+        toast.error(result.details || 'Kunde inte parsa filen');
+      }
+    } catch (error) {
+      toast.error('Importfel: ' + error.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -97,7 +183,7 @@ export default function UttagLista() {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <h1 className="text-3xl font-bold">📋 Samtliga uttag</h1>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <label className="font-semibold flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           Period:
@@ -108,11 +194,30 @@ export default function UttagLista() {
           onChange={(e) => setFilterPeriod(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg"
         />
-        {sorted.length > 0 && (
-          <Button onClick={handleExport} className="bg-green-600 hover:bg-green-700 ml-auto">
-            <Download className="w-4 h-4 mr-2" /> Exportera CSV
+        <div className="flex gap-2 ml-auto">
+          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
+            <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
           </Button>
-        )}
+          <Button 
+            onClick={handleImportClick}
+            disabled={uploading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Importera
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleExcelUpload}
+            className="hidden"
+          />
+          {sorted.length > 0 && (
+            <Button onClick={handleExport} className="bg-green-600 hover:bg-green-700">
+              <Download className="w-4 h-4 mr-2" /> Exportera CSV
+            </Button>
+          )}
+        </div>
       </div>
 
       {sorted.length > 0 ? (

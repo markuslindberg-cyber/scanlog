@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import BarcodeInput from '@/components/BarcodeInput';
-import { Trash2, Check, Upload, FileDown } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function UttagForm() {
@@ -14,8 +14,6 @@ export default function UttagForm() {
   const [personalList, setPersonalList] = useState([]);
   const [kundList, setKundList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,87 +59,7 @@ export default function UttagForm() {
     toast.success(`${artikel.benämning} tillagd`);
   };
 
-  const handleDownloadTemplate = async () => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const ws_data = [
-        ['datum', 'personal_id', 'kund_id', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
-        [today, personalList[0]?.id || '', kundList[0]?.id || '', 'ORD-001', articles[0]?.id || '', 10, 100, today.slice(0, 7)]
-      ];
 
-      const csv = ws_data.map(row => 
-        row.map(cell => {
-          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-            return `"${cell.replace(/"/g, '""')}"`;
-          }
-          return cell;
-        }).join(',')
-      ).join('\n');
-
-      const encoder = new TextEncoder();
-      const csvBytes = encoder.encode(csv);
-      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-      const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'uttag_mall.csv';
-      link.click();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      toast.error('Kunde inte ladda ned mall');
-    }
-  };
-
-  const handleImportClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleExcelUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const uploadResult = await base44.integrations.Core.UploadFile({ file });
-      
-      const uttagSchema = {
-        type: 'object',
-        properties: {
-          datum: { type: 'string', format: 'date' },
-          personal_id: { type: 'string' },
-          kund_id: { type: 'string' },
-          ordernummer: { type: 'string' },
-          artikel_id: { type: 'string' },
-          antal: { type: 'integer' },
-          pris: { type: 'number' },
-          månad: { type: 'string' }
-        },
-        required: ['datum', 'personal_id', 'kund_id', 'artikel_id', 'antal', 'pris', 'månad']
-      };
-      
-      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
-        file_url: uploadResult.file_url,
-        json_schema: uttagSchema
-      });
-
-      if (result.status === 'success' && Array.isArray(result.output)) {
-        const validUttag = result.output.filter(u => u.antal > 0);
-        await base44.entities.Uttag.bulkCreate(validUttag);
-        toast.success(`${result.output.length} uttag importerade!`);
-      } else {
-        toast.error(result.details || 'Kunde inte parsa filen');
-      }
-    } catch (error) {
-      toast.error('Importfel: ' + error.message);
-    } finally {
-      setUploading(false);
-      e.target.value = '';
-    }
-  };
 
   const handleConfirm = async () => {
     if (!personal || !kund || scannedeArtiklar.length === 0) {
@@ -181,28 +99,7 @@ export default function UttagForm() {
     <div className="max-w-2xl mx-auto p-4 space-y-6">
       <h1 className="text-3xl font-bold">📦 Nytt uttag</h1>
 
-      <div className="bg-white rounded-lg p-6 border border-gray-200 space-y-4">
-        <h2 className="font-semibold text-lg">📥 Importera tidigare uttag</h2>
-        <div className="flex gap-2">
-          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700 flex-1">
-            <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
-          </Button>
-          <Button 
-            onClick={handleImportClick}
-            disabled={uploading}
-            className="bg-green-600 hover:bg-green-700 flex-1"
-          >
-            <Upload className="w-4 h-4 mr-2" /> Importera Excel
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            onChange={handleExcelUpload}
-            className="hidden"
-          />
-        </div>
-      </div>
+
 
       <div className="bg-white rounded-lg p-6 border border-gray-200 space-y-4">
         <div>
