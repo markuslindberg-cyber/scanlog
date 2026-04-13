@@ -11,6 +11,7 @@ import Lager from './pages/Lager';
 import KostnadPerKund from './pages/KostnadPerKund';
 import Inventering from './pages/Inventering';
 import Demo from './pages/Demo';
+import KundHantering from './pages/KundHantering';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
         <Route path="/lager" element={<Lager />} />
         <Route path="/kostnad" element={<KostnadPerKund />} />
         <Route path="/inventering" element={<Inventering />} />
+        <Route path="/kunder" element={<KundHantering />} />
         <Route path="/demo" element={<Demo />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
