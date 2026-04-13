@@ -44,6 +44,7 @@ export default function UttagLista() {
   const getPersonalNamn = (id) => personal.find(p => p.id === id)?.namn || '-';
   const getKundNamn = (id) => kunder.find(k => k.id === id)?.namn || '-';
   const getArtikelNamn = (id) => artiklar.find(a => a.id === id)?.benämning || '-';
+  const getStreckkod = (id) => artiklar.find(a => a.id === id)?.streckkod || '-';
 
   const filtered = uttag
     .filter(u => u.månad === filterPeriod)
@@ -51,7 +52,8 @@ export default function UttagLista() {
       ...u,
       personalNamn: getPersonalNamn(u.personal_id),
       kundNamn: getKundNamn(u.kund_id),
-      artikelNamn: getArtikelNamn(u.artikel_id)
+      artikelNamn: getArtikelNamn(u.artikel_id),
+      streckkod: getStreckkod(u.artikel_id)
     }));
 
   const sorted = [...filtered].sort((a, b) => {
@@ -280,6 +282,7 @@ export default function UttagLista() {
                       {sortBy === 'artikelNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
                     </div>
                   </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Streckkod</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('antal')}>
                     <div className="flex items-center justify-end gap-2">
                       Mängd
@@ -305,6 +308,7 @@ export default function UttagLista() {
                     <td className="px-4 py-3 text-sm">{u.personalNamn}</td>
                     <td className="px-4 py-3 text-sm">{u.kundNamn}</td>
                     <td className="px-4 py-3 text-sm">{u.artikelNamn}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{u.streckkod}</td>
                     <td className="px-4 py-3 text-right text-sm">
                       {isEditing ? (
                         <input
