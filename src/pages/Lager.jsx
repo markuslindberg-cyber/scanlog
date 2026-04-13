@@ -109,8 +109,9 @@ export default function Lager() {
       console.log('5. Extraktion klar:', result);
 
       if (result.status === 'success' && Array.isArray(result.output)) {
-        console.log('6. Skapar ', result.output.length, ' artiklar');
-        await base44.entities.Artikel.bulkCreate(result.output);
+        const validArtiklar = result.output.filter(a => a.antal_inköpta > 0);
+        console.log('6. Skapar ', validArtiklar.length, ' artiklar (filtrerade bort ', result.output.length - validArtiklar.length, ' med antal 0)');
+        await base44.entities.Artikel.bulkCreate(validArtiklar);
         toast.success(`${result.output.length} artiklar importerade!`);
         loadData();
       } else {
@@ -138,10 +139,10 @@ export default function Lager() {
     a.streckkod.includes(search)
   );
 
-  const tomma = filtered.filter(a => a.antal_inköpta > 0 && calculateSaldo(a) === 0).length;
+  const tomma = filtered.filter(a => calculateSaldo(a) === 0).length;
   const lågtSaldo = filtered.filter(a => {
     const saldo = calculateSaldo(a);
-    return a.antal_inköpta > 0 && saldo > 0 && saldo < (a.lagertröskelvärde || 10);
+    return saldo > 0 && saldo < (a.lagertröskelvärde || 10);
   }).length;
 
   if (loading) return <div className="flex justify-center p-8">Laddar...</div>;
