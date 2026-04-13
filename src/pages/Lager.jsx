@@ -267,7 +267,17 @@ export default function Lager() {
         }}
       />
 
-      <div className="bg-white rounded-lg p-4 border border-gray-200">
+      <div className="bg-white rounded-lg p-4 border border-gray-200 space-y-3">
+        <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-yellow-50 border border-yellow-200 rounded"></div>
+            <span className="text-gray-700">Lågt saldo (under tröskel)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-50 border border-red-200 rounded"></div>
+            <span className="text-gray-700">Slut i lager</span>
+          </div>
+        </div>
         <input
           type="text"
           placeholder="Sök artikel eller streckkod..."
