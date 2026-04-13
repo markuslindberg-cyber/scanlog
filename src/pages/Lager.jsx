@@ -63,6 +63,11 @@ export default function Lager() {
     }
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
+  };
+
   const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -120,7 +125,7 @@ export default function Lager() {
             <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
           </Button>
           <Button 
-            onClick={() => fileInputRef.current?.click()}
+            onClick={handleImportClick}
             disabled={uploading}
             className="bg-green-600 hover:bg-green-700"
           >
@@ -131,6 +136,7 @@ export default function Lager() {
             type="file"
             accept=".csv,.xlsx,.xls"
             onChange={handleExcelUpload}
+            onInput={handleExcelUpload}
             className="hidden"
           />
           <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
