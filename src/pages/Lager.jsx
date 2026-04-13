@@ -79,21 +79,37 @@ export default function Lager() {
 
     setUploading(true);
     try {
+      console.log('1. Laddar upp fil:', file.name);
       const uploadResult = await base44.integrations.Core.UploadFile({ file });
+      console.log('2. Fil uppladdad:', uploadResult.file_url);
+      
       const schema = await base44.entities.Artikel.schema();
-      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+      console.log('3. Schema hämtat:', schema);
+      
+      const extractPayload = {
         file_url: uploadResult.file_url,
-        json_schema: { type: 'object', properties: schema.properties, required: schema.required }
-      });
+        json_schema: {
+          type: 'object',
+          properties: schema.properties,
+          required: schema.required
+        }
+      };
+      console.log('4. Extraherar data med schema:', extractPayload.json_schema);
+      
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile(extractPayload);
+      console.log('5. Extraktion klar:', result);
 
       if (result.status === 'success' && Array.isArray(result.output)) {
+        console.log('6. Skapar ', result.output.length, ' artiklar');
         await base44.entities.Artikel.bulkCreate(result.output);
         toast.success(`${result.output.length} artiklar importerade!`);
         loadData();
       } else {
+        console.error('5b. Extraktion misslyckades:', result);
         toast.error(result.details || 'Kunde inte parsa filen');
       }
     } catch (error) {
+      console.error('Importfel:', error);
       toast.error('Importfel: ' + error.message);
     } finally {
       setUploading(false);
