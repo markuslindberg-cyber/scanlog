@@ -12,6 +12,7 @@ export default function Lager() {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const loadData = async () => {
     try {
@@ -118,20 +119,20 @@ export default function Lager() {
           <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
             <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
           </Button>
-          <label className="cursor-pointer">
-            <Button asChild className="bg-green-600 hover:bg-green-700">
-              <span>
-                <Upload className="w-4 h-4 mr-2" /> Importera Excel
-              </span>
-            </Button>
-            <input
-              type="file"
-              accept=".csv,.xlsx,.xls"
-              onChange={handleExcelUpload}
-              disabled={uploading}
-              className="hidden"
-            />
-          </label>
+          <Button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Importera Excel
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleExcelUpload}
+            className="hidden"
+          />
           <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
           </Button>
