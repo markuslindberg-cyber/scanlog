@@ -35,13 +35,11 @@ export default function Lager() {
 
   const handleDownloadTemplate = async () => {
     try {
-      // Create XLSX workbook
       const ws_data = [
         ['benämning', 'artikelnummer', 'streckkod', 'pris', 'inköpsdatum', 'antal_inköpta', 'lagertröskelvärde'],
         ['Exempel artikel', '123456', '71387', 99.99, new Date().toISOString().split('T')[0], 100, 10]
       ];
 
-      // Convert to CSV string for now (XLSX needs external library)
       const csv = ws_data.map(row => 
         row.map(cell => {
           if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
@@ -94,7 +92,7 @@ export default function Lager() {
       setUploading(false);
       e.target.value = '';
     }
-  }
+  };
 
   const calculateSaldo = (artikel) => {
     const totalUttag = uttag
