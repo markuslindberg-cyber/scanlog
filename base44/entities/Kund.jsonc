@@ -1,0 +1,23 @@
+{
+  "name": "Kund",
+  "type": "object",
+  "properties": {
+    "namn": {
+      "type": "string",
+      "description": "Kundnamn"
+    },
+    "typ": {
+      "type": "string",
+      "enum": [
+        "Cemi",
+        "PHM",
+        "\u00d6vrig"
+      ],
+      "description": "Kundtyp"
+    }
+  },
+  "required": [
+    "namn",
+    "typ"
+  ]
+}

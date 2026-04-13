@@ -1,0 +1,29 @@
+{
+  "name": "InventeringScannnning",
+  "type": "object",
+  "properties": {
+    "streckkod": {
+      "type": "string",
+      "description": "Skannad streckkod"
+    },
+    "scannad_tid": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Tidpunkt f\u00f6r skanning"
+    },
+    "inventering_id": {
+      "type": "string",
+      "description": "Referens till Inventering"
+    },
+    "antal": {
+      "type": "integer",
+      "description": "Antal skannat"
+    }
+  },
+  "required": [
+    "streckkod",
+    "scannad_tid",
+    "inventering_id",
+    "antal"
+  ]
+}

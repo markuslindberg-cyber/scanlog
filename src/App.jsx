@@ -5,7 +5,12 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import Layout from './components/Layout';
+import UttagForm from './pages/UttagForm';
+import Lager from './pages/Lager';
+import KostnadPerKund from './pages/KostnadPerKund';
+import Inventering from './pages/Inventering';
+import Demo from './pages/Demo';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +38,14 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<UttagForm />} />
+        <Route path="/uttag" element={<UttagForm />} />
+        <Route path="/lager" element={<Lager />} />
+        <Route path="/kostnad" element={<KostnadPerKund />} />
+        <Route path="/inventering" element={<Inventering />} />
+        <Route path="/demo" element={<Demo />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

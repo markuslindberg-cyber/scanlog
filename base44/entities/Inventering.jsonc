@@ -1,0 +1,23 @@
+{
+  "name": "Inventering",
+  "type": "object",
+  "properties": {
+    "startdatum": {
+      "type": "string",
+      "format": "date",
+      "description": "Startdatum f\u00f6r inventering"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "p\u00e5g\u00e5ende",
+        "avslutad"
+      ],
+      "description": "Status p\u00e5 inventeringen"
+    }
+  },
+  "required": [
+    "startdatum",
+    "status"
+  ]
+}

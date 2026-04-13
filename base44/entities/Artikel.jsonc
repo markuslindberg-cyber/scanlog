@@ -1,0 +1,42 @@
+{
+  "name": "Artikel",
+  "type": "object",
+  "properties": {
+    "ben\u00e4mning": {
+      "type": "string",
+      "description": "Artikelnamn"
+    },
+    "artikelnummer": {
+      "type": "string",
+      "description": "Artikelnummer"
+    },
+    "streckkod": {
+      "type": "string",
+      "description": "Unik streckkod"
+    },
+    "pris": {
+      "type": "number",
+      "description": "Pris per enhet"
+    },
+    "ink\u00f6psdatum": {
+      "type": "string",
+      "format": "date",
+      "description": "Ink\u00f6psdatum"
+    },
+    "antal_ink\u00f6pta": {
+      "type": "integer",
+      "description": "Totalt antal ink\u00f6pta"
+    },
+    "lagertr\u00f6skelv\u00e4rde": {
+      "type": "integer",
+      "description": "Varning n\u00e4r saldo understiger detta",
+      "default": 10
+    }
+  },
+  "required": [
+    "ben\u00e4mning",
+    "streckkod",
+    "pris",
+    "antal_ink\u00f6pta"
+  ]
+}

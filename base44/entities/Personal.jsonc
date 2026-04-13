@@ -1,0 +1,13 @@
+{
+  "name": "Personal",
+  "type": "object",
+  "properties": {
+    "namn": {
+      "type": "string",
+      "description": "Personalens namn"
+    }
+  },
+  "required": [
+    "namn"
+  ]
+}

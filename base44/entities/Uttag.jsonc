@@ -1,0 +1,48 @@
+{
+  "name": "Uttag",
+  "type": "object",
+  "properties": {
+    "datum": {
+      "type": "string",
+      "format": "date",
+      "description": "Datum f\u00f6r uttaget"
+    },
+    "personal_id": {
+      "type": "string",
+      "description": "Referens till Personal"
+    },
+    "kund_id": {
+      "type": "string",
+      "description": "Referens till Kund"
+    },
+    "ordernummer": {
+      "type": "string",
+      "description": "Valfritt ordernummer"
+    },
+    "artikel_id": {
+      "type": "string",
+      "description": "Referens till Artikel"
+    },
+    "antal": {
+      "type": "integer",
+      "description": "Antal uttagna"
+    },
+    "pris": {
+      "type": "number",
+      "description": "Totalpris f\u00f6r uttaget"
+    },
+    "m\u00e5nad": {
+      "type": "string",
+      "description": "M\u00e5nad i format YYYY-MM"
+    }
+  },
+  "required": [
+    "datum",
+    "personal_id",
+    "kund_id",
+    "artikel_id",
+    "antal",
+    "pris",
+    "m\u00e5nad"
+  ]
+}
