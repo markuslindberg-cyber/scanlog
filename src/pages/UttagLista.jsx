@@ -74,8 +74,8 @@ export default function UttagLista() {
     try {
       const today = new Date().toISOString().split('T')[0];
       const ws_data = [
-        ['datum', 'personal_id', 'kund_id', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
-        [today, personal[0]?.id || '', kunder[0]?.id || '', 'ORD-001', artiklar[0]?.id || '', 10, 100, today.slice(0, 7)]
+        ['datum', 'personal', 'kund', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
+        [today, personal[0]?.namn || '', kunder[0]?.namn || '', 'ORD-001', artiklar[0]?.id || '', 10, 100, today.slice(0, 7)]
       ];
 
       const csv = ws_data.map(row => 
@@ -122,15 +122,15 @@ export default function UttagLista() {
         type: 'object',
         properties: {
           datum: { type: 'string', format: 'date' },
-          personal_id: { type: 'string' },
-          kund_id: { type: 'string' },
+          personal: { type: 'string' },
+          kund: { type: 'string' },
           ordernummer: { type: 'string' },
           artikel_id: { type: 'string' },
           antal: { type: 'integer' },
           pris: { type: 'number' },
           månad: { type: 'string' }
         },
-        required: ['datum', 'personal_id', 'kund_id', 'artikel_id', 'antal', 'pris', 'månad']
+        required: ['datum', 'personal', 'kund', 'artikel_id', 'antal', 'pris', 'månad']
       };
       
       const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
@@ -139,9 +139,25 @@ export default function UttagLista() {
       });
 
       if (result.status === 'success' && Array.isArray(result.output)) {
-        const validUttag = result.output.filter(u => u.antal > 0);
+        const personalMap = Object.fromEntries(personal.map(p => [p.namn, p.id]));
+        const kundMap = Object.fromEntries(kunder.map(k => [k.namn, k.id]));
+        
+        const validUttag = result.output
+          .filter(u => u.antal > 0)
+          .map(u => ({
+            ...u,
+            personal_id: personalMap[u.personal],
+            kund_id: kundMap[u.kund]
+          }))
+          .filter(u => u.personal_id && u.kund_id);
+
+        if (validUttag.length === 0) {
+          toast.error('Inga giltiga uttag - kontrollera personal och kundnamn');
+          return;
+        }
+
         await base44.entities.Uttag.bulkCreate(validUttag);
-        toast.success(`${result.output.length} uttag importerade!`);
+        toast.success(`${validUttag.length} uttag importerade!`);
         loadData();
       } else {
         toast.error(result.details || 'Kunde inte parsa filen');
