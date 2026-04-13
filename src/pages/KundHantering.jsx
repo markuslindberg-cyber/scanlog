@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import EditKundDialog from '@/components/EditKundDialog';
 
 export default function KundHantering() {
   const [kunder, setKunder] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingKund, setEditingKund] = useState(null);
   const [form, setForm] = useState({
     namn: '',
     typ: 'Cemi',
@@ -66,6 +68,16 @@ export default function KundHantering() {
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <h1 className="text-3xl font-bold">👥 Kundhantering</h1>
+
+      <EditKundDialog
+        isOpen={!!editingKund}
+        onClose={() => setEditingKund(null)}
+        onSuccess={() => {
+          setEditingKund(null);
+          loadKunder();
+        }}
+        kund={editingKund}
+      />
 
       <div className="bg-white rounded-lg p-6 border border-gray-200">
         <h2 className="text-lg font-semibold mb-4">Lägg till ny kund</h2>
@@ -136,12 +148,20 @@ export default function KundHantering() {
                     <td className="px-4 py-3">{kund.typ}</td>
                     <td className="px-4 py-3">{kund.projektnummer || '-'}</td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => handleDelete(kund.id)}
-                        className="p-2 hover:bg-red-100 rounded-lg text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => setEditingKund(kund)}
+                          className="p-2 hover:bg-blue-100 rounded-lg text-blue-600"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(kund.id)}
+                          className="p-2 hover:bg-red-100 rounded-lg text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
