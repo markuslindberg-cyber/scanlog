@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { X, Info } from 'lucide-react';
+import { X, Info, Scan } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 
@@ -39,6 +39,27 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
     }
     
     setForm(newForm);
+  };
+
+  const handleBarcodeScanned = (barcode) => {
+    const existing = artiklar.find(a => a.streckkod === barcode);
+    if (existing) {
+      setForm({
+        benämning: existing.benämning,
+        artikelnummer: existing.artikelnummer || '',
+        streckkod: existing.streckkod,
+        pris: String(existing.pris),
+        inköpsdatum: new Date().toISOString().split('T')[0],
+        antal_inköpta: '',
+        lagertröskelvärde: String(existing.lagertröskelvärde || 10)
+      });
+    } else {
+      setForm({
+        ...form,
+        streckkod: barcode,
+        inköpsdatum: new Date().toISOString().split('T')[0]
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -91,6 +112,26 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-sm font-semibold mb-1">Streckkod (scanna eller skriv manuellt) *</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={form.streckkod}
+                onChange={(e) => setForm({ ...form, streckkod: e.target.value })}
+                onBlur={(e) => {
+                  if (e.target.value) handleBarcodeScanned(e.target.value);
+                }}
+                placeholder="Scanna eller skriv streckkod..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                autoFocus
+              />
+              <Button type="button" variant="outline" className="px-3">
+                <Scan className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div>
             <label className="block text-sm font-semibold mb-1">Benämning *</label>
             <input
               type="text"
@@ -114,17 +155,7 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold mb-1">Streckkod *</label>
-            <input
-              type="text"
-              name="streckkod"
-              value={form.streckkod}
-              onChange={handleChange}
-              placeholder="t.ex. 71387"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
+
 
           <div className="grid grid-cols-2 gap-4">
             <div>
