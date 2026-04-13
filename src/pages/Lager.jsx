@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, AlertTriangle, Plus, Upload, FileDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Plus, Upload, FileDown, ArrowUp, ArrowDown, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
@@ -394,8 +394,17 @@ export default function Lager() {
                       </>
                     ) : (
                       <>
-                        <td className="px-4 py-3 cursor-pointer" onClick={(e) => handleEditClick(e, artikel)}>
-                          <p className="font-medium text-blue-600 hover:underline">{artikel.benämning}</p>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium">{artikel.benämning}</p>
+                            <button
+                              onClick={(e) => handleEditClick(e, artikel)}
+                              className="text-blue-600 hover:bg-blue-50 p-1 rounded ml-2 flex-shrink-0"
+                              title="Redigera"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
                         <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
