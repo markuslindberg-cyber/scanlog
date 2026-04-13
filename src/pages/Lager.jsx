@@ -63,8 +63,8 @@ export default function Lager() {
 
   const handleImportClick = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click();
       fileInputRef.current.value = '';
+      fileInputRef.current.click();
     }
   };
 
