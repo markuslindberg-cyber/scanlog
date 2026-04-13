@@ -11,7 +11,11 @@
       "enum": [
         "Cemi",
         "PHM",
-        "\u00d6vrig"
+        "\u00d6vrig",
+        "BRF",
+        "Kommersiella",
+        "Koncernbolag",
+        "Internt"
       ],
       "description": "Kundtyp"
     },

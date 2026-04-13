@@ -103,6 +103,10 @@ export default function KundHantering() {
               <option value="Cemi">Cemi</option>
               <option value="PHM">PHM</option>
               <option value="Övrig">Övrig</option>
+              <option value="BRF">BRF</option>
+              <option value="Kommersiella">Kommersiella</option>
+              <option value="Koncernbolag">Koncernbolag</option>
+              <option value="Internt">Internt</option>
             </select>
           </div>
 
