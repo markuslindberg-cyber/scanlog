@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, AlertTriangle, Plus } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ export default function Lager() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const loadData = async () => {
     try {
@@ -30,6 +31,34 @@ export default function Lager() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileUrl = await base44.integrations.Core.UploadFile({ file });
+      const schema = await base44.entities.Artikel.schema();
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+        file_url: fileUrl.file_url,
+        json_schema: { type: 'object', properties: schema.properties, required: schema.required }
+      });
+
+      if (result.status === 'success' && Array.isArray(result.output)) {
+        await base44.entities.Artikel.bulkCreate(result.output);
+        toast.success(`${result.output.length} artiklar importerade!`);
+        loadData();
+      } else {
+        toast.error('Kunde inte parsa Excel-filen');
+      }
+    } catch (error) {
+      toast.error('Importfel: ' + error.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  }
 
   const calculateSaldo = (artikel) => {
     const totalUttag = uttag
@@ -55,9 +84,25 @@ export default function Lager() {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">📦 Lager</h1>
-        <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
-        </Button>
+        <div className="flex gap-2">
+          <label className="cursor-pointer">
+            <Button asChild className="bg-green-600 hover:bg-green-700">
+              <span>
+                <Upload className="w-4 h-4 mr-2" /> Importera Excel
+              </span>
+            </Button>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleExcelUpload}
+              disabled={uploading}
+              className="hidden"
+            />
+          </label>
+          <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
+          </Button>
+        </div>
       </div>
 
       <AddArtikelDialog
