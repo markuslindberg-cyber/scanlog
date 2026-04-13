@@ -74,8 +74,8 @@ export default function UttagLista() {
     try {
       const today = new Date().toISOString().split('T')[0];
       const ws_data = [
-        ['datum', 'personal', 'kund', 'ordernummer', 'artikel_id', 'antal', 'pris', 'månad'],
-        [today, personal[0]?.namn || '', kunder[0]?.namn || '', 'ORD-001', artiklar[0]?.id || '', 10, 100, today.slice(0, 7)]
+        ['datum', 'personal', 'kund', 'ordernummer', 'streckkod', 'antal', 'pris', 'månad'],
+        [today, personal[0]?.namn || '', kunder[0]?.namn || '', 'ORD-001', artiklar[0]?.streckkod || '', 10, 100, today.slice(0, 7)]
       ];
 
       const csv = ws_data.map(row => 
@@ -125,12 +125,12 @@ export default function UttagLista() {
           personal: { type: 'string' },
           kund: { type: 'string' },
           ordernummer: { type: 'string' },
-          artikel_id: { type: 'string' },
+          streckkod: { type: 'string' },
           antal: { type: 'integer' },
           pris: { type: 'number' },
           månad: { type: 'string' }
         },
-        required: ['datum', 'personal', 'kund', 'artikel_id', 'antal', 'pris', 'månad']
+        required: ['datum', 'personal', 'kund', 'streckkod', 'antal', 'pris', 'månad']
       };
       
       const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
@@ -141,15 +141,17 @@ export default function UttagLista() {
       if (result.status === 'success' && Array.isArray(result.output)) {
         const personalMap = Object.fromEntries(personal.map(p => [p.namn, p.id]));
         const kundMap = Object.fromEntries(kunder.map(k => [k.namn, k.id]));
+        const artikelMap = Object.fromEntries(artiklar.map(a => [a.streckkod, a.id]));
         
         const validUttag = result.output
           .filter(u => u.antal > 0)
           .map(u => ({
             ...u,
             personal_id: personalMap[u.personal],
-            kund_id: kundMap[u.kund]
+            kund_id: kundMap[u.kund],
+            artikel_id: artikelMap[u.streckkod]
           }))
-          .filter(u => u.personal_id && u.kund_id);
+          .filter(u => u.personal_id && u.kund_id && u.artikel_id);
 
         if (validUttag.length === 0) {
           toast.error('Inga giltiga uttag - kontrollera personal och kundnamn');
