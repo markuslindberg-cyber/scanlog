@@ -9,7 +9,8 @@ export default function KundHantering() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     namn: '',
-    typ: 'Cemi'
+    typ: 'Cemi',
+    projektnummer: ''
   });
 
   const loadKunder = async () => {
@@ -37,10 +38,11 @@ export default function KundHantering() {
     try {
       await base44.entities.Kund.create({
         namn: form.namn,
-        typ: form.typ
+        typ: form.typ,
+        projektnummer: form.projektnummer || null
       });
       toast.success('Kund tillagd!');
-      setForm({ namn: '', typ: 'Cemi' });
+      setForm({ namn: '', typ: 'Cemi', projektnummer: '' });
       loadKunder();
     } catch (error) {
       toast.error('Kunde inte lägga till kund');
@@ -92,6 +94,17 @@ export default function KundHantering() {
             </select>
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold mb-2">Projektnummer</label>
+            <input
+              type="text"
+              value={form.projektnummer}
+              onChange={(e) => setForm({ ...form, projektnummer: e.target.value })}
+              placeholder="t.ex. PROJ-001"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+
           <Button type="submit" className="bg-blue-600 hover:bg-blue-700 w-full">
             <Plus className="w-4 h-4 mr-2" /> Lägg till kund
           </Button>
@@ -105,6 +118,7 @@ export default function KundHantering() {
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Namn</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Typ</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Projektnummer</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold">Åtgärd</th>
               </tr>
             </thead>
@@ -120,6 +134,7 @@ export default function KundHantering() {
                   <tr key={kund.id}>
                     <td className="px-4 py-3 font-medium">{kund.namn}</td>
                     <td className="px-4 py-3">{kund.typ}</td>
+                    <td className="px-4 py-3">{kund.projektnummer || '-'}</td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDelete(kund.id)}
