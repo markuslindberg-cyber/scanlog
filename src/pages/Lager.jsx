@@ -43,18 +43,18 @@ export default function Lager() {
       // Convert to CSV string for now (XLSX needs external library)
       const csv = ws_data.map(row => 
         row.map(cell => {
-          if (typeof cell === 'string' && cell.includes(',')) {
-            return `"${cell}"`;
+          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+            return `"${cell.replace(/"/g, '""')}"`;
           }
           return cell;
         }).join(',')
       ).join('\n');
 
-      const blob = new Blob([csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'artiklar_mall.xlsx';
+      link.download = 'artiklar_mall.csv';
       link.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
