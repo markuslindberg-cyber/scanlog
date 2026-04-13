@@ -38,11 +38,11 @@ export default function Lager() {
       const today = new Date().toISOString().split('T')[0];
       const ws_data = [
         ['benämning', 'artikelnummer', 'streckkod', 'pris', 'inköpsdatum', 'antal_inköpta', 'lagertröskelvärde'],
-        ['Clemondo Katrin Clasic S', '1521307', '71387', 23.81, today, 515, 50],
-        ['YES Maskindisk 99st', '2245789', '82904', 110, today, 17, 5],
-        ['Torkrulle Tork Uni', '1678934', '56123', 45.50, today, 42, 15],
-        ['Activ color 3-pack', '3456789', '91234', 339, today, 2, 1],
-        ['Papperskorgspåse', '4567890', '34567', 89.99, today, 100, 20]
+        ['Clemondo Katrin Clasic S', '1521307', '71387', 23.81, today, 1000, 50],
+        ['YES Maskindisk 99st', '2245789', '82904', 110, today, 500, 5],
+        ['Torkrulle Tork Uni', '1678934', '56123', 45.50, today, 750, 15],
+        ['Activ color 3-pack', '3456789', '91234', 339, today, 200, 1],
+        ['Papperskorgspåse', '4567890', '34567', 89.99, today, 800, 20]
       ];
 
       const csv = ws_data.map(row => 
