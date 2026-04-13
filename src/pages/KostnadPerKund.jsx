@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -6,8 +7,10 @@ import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function KostnadPerKund() {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedKund, setSelectedKund] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,10 +85,14 @@ export default function KostnadPerKund() {
 
           <div className="space-y-3">
             {data.map(item => (
-              <div key={item.kund_id} className="flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200">
+              <button
+                key={item.kund_id}
+                onClick={() => navigate(`/kund-uttag/${item.kund_id}`)}
+                className="w-full flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+              >
                 <span className="font-medium">{item.namn}</span>
                 <span className="font-bold text-lg">{item.total.toFixed(2)} kr</span>
-              </div>
+              </button>
             ))}
           </div>
 
