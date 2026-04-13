@@ -138,10 +138,10 @@ export default function Lager() {
     a.streckkod.includes(search)
   );
 
-  const tomma = filtered.filter(a => calculateSaldo(a) === 0).length;
+  const tomma = filtered.filter(a => a.antal_inköpta > 0 && calculateSaldo(a) === 0).length;
   const lågtSaldo = filtered.filter(a => {
     const saldo = calculateSaldo(a);
-    return saldo > 0 && saldo < (a.lagertröskelvärde || 10);
+    return a.antal_inköpta > 0 && saldo > 0 && saldo < (a.lagertröskelvärde || 10);
   }).length;
 
   if (loading) return <div className="flex justify-center p-8">Laddar...</div>;
