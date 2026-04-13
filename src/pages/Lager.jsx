@@ -83,20 +83,26 @@ export default function Lager() {
       const uploadResult = await base44.integrations.Core.UploadFile({ file });
       console.log('2. Fil uppladdad:', uploadResult.file_url);
       
-      const schema = await base44.entities.Artikel.schema();
-      console.log('3. Schema hämtat:', schema);
-      
-      const extractPayload = {
-        file_url: uploadResult.file_url,
-        json_schema: {
-          type: 'object',
-          properties: schema.properties,
-          required: schema.required
-        }
+      const artikelSchema = {
+        type: 'object',
+        properties: {
+          benämning: { type: 'string' },
+          artikelnummer: { type: 'string' },
+          streckkod: { type: 'string' },
+          pris: { type: 'number' },
+          inköpsdatum: { type: 'string', format: 'date' },
+          antal_inköpta: { type: 'integer' },
+          lagertröskelvärde: { type: 'integer' }
+        },
+        required: ['benämning', 'streckkod', 'pris', 'antal_inköpta']
       };
-      console.log('4. Extraherar data med schema:', extractPayload.json_schema);
+      console.log('3. Schema definierat');
       
-      const result = await base44.integrations.Core.ExtractDataFromUploadedFile(extractPayload);
+      console.log('4. Extraherar data...');
+      const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+        file_url: uploadResult.file_url,
+        json_schema: artikelSchema
+      });
       console.log('5. Extraktion klar:', result);
 
       if (result.status === 'success' && Array.isArray(result.output)) {
