@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Package, BarChart3, DollarSign, Search, Users } from 'lucide-react';
+import { Package, BarChart3, DollarSign, Search, Users, Users as UsersIcon } from 'lucide-react';
 
 export default function Layout() {
   const location = useLocation();
@@ -9,6 +9,7 @@ export default function Layout() {
     { path: '/lager', icon: BarChart3, label: 'Lager', title: '📦' },
     { path: '/kostnad', icon: DollarSign, label: 'Kostnad', title: '💰' },
     { path: '/inventering', icon: Search, label: 'Inventering', title: '🔍' },
+    { path: '/personal', icon: UsersIcon, label: 'Personal', title: '👤' },
     { path: '/kunder', icon: Users, label: 'Kunder', title: '👥' }
   ];
 
