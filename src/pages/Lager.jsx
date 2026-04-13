@@ -66,6 +66,10 @@ export default function Lager() {
   const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Reset input so same file can be selected again
+    const input = e.target;
+    const resetInput = () => { input.value = ''; };
 
     setUploading(true);
     try {
@@ -87,7 +91,7 @@ export default function Lager() {
       toast.error('Importfel: ' + error.message);
     } finally {
       setUploading(false);
-      e.target.value = '';
+      resetInput();
     }
   }
 
@@ -130,7 +134,7 @@ export default function Lager() {
             ref={fileInputRef}
             type="file"
             accept=".csv,.xlsx,.xls"
-            onChange={handleExcelUpload}
+            onInput={handleExcelUpload}
             className="hidden"
           />
           <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
