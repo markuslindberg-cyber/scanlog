@@ -16,6 +16,8 @@ export default function Lager() {
   const [uploading, setUploading] = useState(false);
   const [sortBy, setSortBy] = useState('benämning');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
   const fileInputRef = useRef(null);
 
   const loadData = async () => {
@@ -191,6 +193,35 @@ export default function Lager() {
     navigate(`/artikel/${streckkod}`);
   };
 
+  const handleEditClick = (e, artikel) => {
+    e.stopPropagation();
+    setEditingId(artikel.id);
+    setEditForm({
+      benämning: artikel.benämning,
+      pris: artikel.pris
+    });
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.stopPropagation();
+    try {
+      await base44.entities.Artikel.update(editingId, {
+        benämning: editForm.benämning,
+        pris: parseFloat(editForm.pris)
+      });
+      toast.success('Artikel uppdaterad!');
+      setEditingId(null);
+      loadData();
+    } catch (error) {
+      toast.error('Kunde inte uppdatera artikel');
+    }
+  };
+
+  const handleCancelEdit = (e) => {
+    e.stopPropagation();
+    setEditingId(null);
+  };
+
   const tomma = filtered.filter(a => calculateSaldo(a) === 0).length;
   const lågtSaldo = filtered.filter(a => {
     const saldo = calculateSaldo(a);
@@ -319,17 +350,68 @@ export default function Lager() {
                 return (
                   <tr
                     key={artikel.id}
-                    className={`${saldoBg} cursor-pointer hover:bg-blue-50 transition-colors`}
-                    onClick={() => handleRowClick(artikel.streckkod)}
+                    className={`${saldoBg} ${editingId !== artikel.id ? 'cursor-pointer hover:bg-blue-50' : ''} transition-colors`}
+                    onClick={() => editingId !== artikel.id && handleRowClick(artikel.streckkod)}
                   >
-                    <td className="px-4 py-3">
-                      <p className="font-medium">{artikel.benämning}</p>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
-                    <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
-                    <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
-                    <td className="px-4 py-3 text-right">{totalUttag}</td>
-                    <td className={`px-4 py-3 text-right ${saldoColor}`}>{saldo}</td>
+                    {editingId === artikel.id ? (
+                      <>
+                        <td className="px-4 py-3">
+                          <input
+                            type="text"
+                            value={editForm.benämning}
+                            onChange={(e) => setEditForm({ ...editForm, benämning: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 rounded w-full"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editForm.pris}
+                            onChange={(e) => setEditForm({ ...editForm, pris: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 rounded w-full text-right"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
+                        <td className="px-4 py-3 text-right">{totalUttag}</td>
+                        <td className="px-4 py-3 text-right space-x-2">
+                          <button
+                            onClick={handleSaveEdit}
+                            className="text-green-600 hover:bg-green-50 p-1 rounded font-semibold"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="text-red-600 hover:bg-red-50 p-1 rounded font-semibold"
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium">{artikel.benämning}</p>
+                            <button
+                              onClick={(e) => handleEditClick(e, artikel)}
+                              className="text-blue-600 hover:bg-blue-50 p-1 rounded"
+                            >
+                              ✎
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
+                        <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
+                        <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
+                        <td className="px-4 py-3 text-right">{totalUttag}</td>
+                        <td className={`px-4 py-3 text-right ${saldoColor}`}>{saldo}</td>
+                      </>
+                    )}
                   </tr>
                 );
               })}
