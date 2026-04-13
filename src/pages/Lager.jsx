@@ -64,7 +64,9 @@ export default function Lager() {
   };
 
   const handleExcelUpload = async (e) => {
+    console.log('handleExcelUpload triggered', e);
     const file = e.target.files?.[0];
+    console.log('File selected:', file);
     if (!file) return;
 
     setUploading(true);
@@ -130,6 +132,7 @@ export default function Lager() {
             ref={fileInputRef}
             type="file"
             accept=".csv,.xlsx,.xls"
+            onInput={handleExcelUpload}
             onChange={handleExcelUpload}
             onClick={(e) => e.target.value = ''}
             className="hidden"
