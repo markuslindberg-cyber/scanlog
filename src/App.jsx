@@ -15,6 +15,7 @@ import Demo from './pages/Demo';
 import KundHantering from './pages/KundHantering';
 import KundUttag from './pages/KundUttag';
 import PersonalHantering from './pages/PersonalHantering';
+import UttagLista from './pages/UttagLista';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/kunder" element={<KundHantering />} />
         <Route path="/kund-uttag/:kund_id" element={<KundUttag />} />
         <Route path="/personal" element={<PersonalHantering />} />
+        <Route path="/uttag-lista" element={<UttagLista />} />
         <Route path="/demo" element={<Demo />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />

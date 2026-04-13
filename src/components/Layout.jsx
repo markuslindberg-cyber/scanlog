@@ -5,8 +5,9 @@ export default function Layout() {
   const location = useLocation();
 
   const navItems = [
-    { path: '/uttag', icon: Package, label: 'Uttag', title: '📦' },
-    { path: '/lager', icon: BarChart3, label: 'Lager', title: '📦' },
+    { path: '/uttag', icon: Package, label: 'Nytt uttag', title: '📦' },
+    { path: '/uttag-lista', icon: BarChart3, label: 'Uttag', title: '📋' },
+    { path: '/lager', icon: Package, label: 'Lager', title: '📦' },
     { path: '/kostnad', icon: DollarSign, label: 'Kostnad', title: '💰' },
     { path: '/inventering', icon: Search, label: 'Inventering', title: '🔍' },
     { path: '/personal', icon: UsersIcon, label: 'Personal', title: '👤' },
