@@ -54,8 +54,10 @@ export default function Lager() {
         }).join(',')
       ).join('\n');
 
+      const encoder = new TextEncoder();
+      const csvBytes = encoder.encode(csv);
       const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-      const blob = new Blob([bom, csv], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
