@@ -14,6 +14,8 @@ export default function UttagLista() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [filterPeriod, setFilterPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
   const fileInputRef = useRef(null);
 
   const loadData = async () => {
@@ -177,6 +179,34 @@ export default function UttagLista() {
 
   const total = sorted.reduce((sum, u) => sum + u.pris, 0);
 
+  const handleEditClick = (item) => {
+    setEditingId(item.id);
+    setEditForm({
+      antal: item.antal,
+      pris: item.pris,
+      ordernummer: item.ordernummer || ''
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await base44.entities.Uttag.update(editingId, {
+        antal: parseInt(editForm.antal),
+        pris: parseFloat(editForm.pris),
+        ordernummer: editForm.ordernummer || null
+      });
+      toast.success('Uttag uppdaterat!');
+      setEditingId(null);
+      loadData();
+    } catch (error) {
+      toast.error('Kunde inte uppdatera uttag');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+  };
+
   if (loading) return <div className="flex justify-center p-8">Laddar...</div>;
 
   return (
@@ -263,20 +293,68 @@ export default function UttagLista() {
                     </div>
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold">Ordernummer</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Åtgärd</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {sorted.map(u => (
-                  <tr key={u.id} className="hover:bg-gray-50">
+                {sorted.map(u => {
+                  const isEditing = editingId === u.id;
+                  return (
+                  <tr key={u.id} className={isEditing ? 'bg-blue-50' : 'hover:bg-gray-50'}>
                     <td className="px-4 py-3 text-sm">{u.datum}</td>
                     <td className="px-4 py-3 text-sm">{u.personalNamn}</td>
                     <td className="px-4 py-3 text-sm">{u.kundNamn}</td>
                     <td className="px-4 py-3 text-sm">{u.artikelNamn}</td>
-                    <td className="px-4 py-3 text-right text-sm">{u.antal}</td>
-                    <td className="px-4 py-3 text-right text-sm font-semibold">{u.pris.toFixed(2)} kr</td>
-                    <td className="px-4 py-3 text-sm">{u.ordernummer || '-'}</td>
+                    <td className="px-4 py-3 text-right text-sm">
+                      {isEditing ? (
+                        <input
+                          type="number"
+                          value={editForm.antal}
+                          onChange={(e) => setEditForm({...editForm, antal: e.target.value})}
+                          className="px-2 py-1 border border-gray-300 rounded w-16"
+                        />
+                      ) : (
+                        u.antal
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right text-sm font-semibold">
+                      {isEditing ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={editForm.pris}
+                          onChange={(e) => setEditForm({...editForm, pris: e.target.value})}
+                          className="px-2 py-1 border border-gray-300 rounded w-20 text-right"
+                        />
+                      ) : (
+                        u.pris.toFixed(2) + ' kr'
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editForm.ordernummer}
+                          onChange={(e) => setEditForm({...editForm, ordernummer: e.target.value})}
+                          className="px-2 py-1 border border-gray-300 rounded w-24"
+                        />
+                      ) : (
+                        u.ordernummer || '-'
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {isEditing ? (
+                        <div className="flex gap-1">
+                          <button onClick={handleSaveEdit} className="text-green-600 font-semibold hover:bg-green-50 px-2 py-1 rounded">✓</button>
+                          <button onClick={handleCancelEdit} className="text-red-600 font-semibold hover:bg-red-50 px-2 py-1 rounded">✕</button>
+                        </div>
+                      ) : (
+                        <button onClick={() => handleEditClick(u)} className="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded">Redigera</button>
+                      )}
+                    </td>
                   </tr>
-                ))}
+                );
+                })}
               </tbody>
             </table>
           </div>
