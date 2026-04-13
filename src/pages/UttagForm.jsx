@@ -179,16 +179,18 @@ export default function UttagForm() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">📦 Nytt uttag</h1>
+      <h1 className="text-3xl font-bold">📦 Nytt uttag</h1>
+
+      <div className="bg-white rounded-lg p-6 border border-gray-200 space-y-4">
+        <h2 className="font-semibold text-lg">📥 Importera tidigare uttag</h2>
         <div className="flex gap-2">
-          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700 flex-1">
             <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
           </Button>
           <Button 
             onClick={handleImportClick}
             disabled={uploading}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 flex-1"
           >
             <Upload className="w-4 h-4 mr-2" /> Importera Excel
           </Button>
