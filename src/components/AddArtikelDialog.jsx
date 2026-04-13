@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 
 export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
@@ -146,7 +147,19 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1">Lagertröskelvärde</label>
+              <div className="flex items-center gap-1 mb-1">
+                <label className="block text-sm font-semibold">Lagertröskelvärde</label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Varning när saldo understiger detta värde</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <input
                 type="number"
                 name="lagertröskelvärde"
