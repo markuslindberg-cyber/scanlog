@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, AlertTriangle, Plus, Upload } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Plus, Upload, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
@@ -31,6 +31,40 @@ export default function Lager() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleDownloadTemplate = () => {
+    const headers = [
+      'benämning',
+      'artikelnummer',
+      'streckkod',
+      'pris',
+      'inköpsdatum',
+      'antal_inköpta',
+      'lagertröskelvärde'
+    ];
+
+    const templateRow = [
+      'Exempel artikel',
+      '123456',
+      '71387',
+      '99.99',
+      new Date().toISOString().split('T')[0],
+      '100',
+      '10'
+    ];
+
+    const csv = [
+      headers.join(','),
+      templateRow.join(',')
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'artiklar_mall.csv';
+    a.click();
+  };
 
   const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -85,6 +119,9 @@ export default function Lager() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">📦 Lager</h1>
         <div className="flex gap-2">
+          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
+            <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
+          </Button>
           <label className="cursor-pointer">
             <Button asChild className="bg-green-600 hover:bg-green-700">
               <span>
