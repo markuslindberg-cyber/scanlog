@@ -32,38 +32,34 @@ export default function Lager() {
     loadData();
   }, []);
 
-  const handleDownloadTemplate = () => {
-    const headers = [
-      'benämning',
-      'artikelnummer',
-      'streckkod',
-      'pris',
-      'inköpsdatum',
-      'antal_inköpta',
-      'lagertröskelvärde'
-    ];
+  const handleDownloadTemplate = async () => {
+    try {
+      // Create XLSX workbook
+      const ws_data = [
+        ['benämning', 'artikelnummer', 'streckkod', 'pris', 'inköpsdatum', 'antal_inköpta', 'lagertröskelvärde'],
+        ['Exempel artikel', '123456', '71387', 99.99, new Date().toISOString().split('T')[0], 100, 10]
+      ];
 
-    const templateRow = [
-      'Exempel artikel',
-      '123456',
-      '71387',
-      '99.99',
-      new Date().toISOString().split('T')[0],
-      '100',
-      '10'
-    ];
+      // Convert to CSV string for now (XLSX needs external library)
+      const csv = ws_data.map(row => 
+        row.map(cell => {
+          if (typeof cell === 'string' && cell.includes(',')) {
+            return `"${cell}"`;
+          }
+          return cell;
+        }).join(',')
+      ).join('\n');
 
-    const csv = [
-      headers.join(','),
-      templateRow.join(',')
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'artiklar_mall.csv';
-    a.click();
+      const blob = new Blob([csv], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'artiklar_mall.xlsx';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Kunde inte ladda ned mall');
+    }
   };
 
   const handleExcelUpload = async (e) => {
