@@ -136,7 +136,6 @@ export default function Lager() {
             type="file"
             accept=".csv,.xlsx,.xls"
             onChange={handleExcelUpload}
-            onInput={handleExcelUpload}
             className="hidden"
           />
           <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
