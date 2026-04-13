@@ -394,16 +394,8 @@ export default function Lager() {
                       </>
                     ) : (
                       <>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium">{artikel.benämning}</p>
-                            <button
-                              onClick={(e) => handleEditClick(e, artikel)}
-                              className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-                            >
-                              ✎
-                            </button>
-                          </div>
+                        <td className="px-4 py-3 cursor-pointer" onClick={(e) => handleEditClick(e, artikel)}>
+                          <p className="font-medium text-blue-600 hover:underline">{artikel.benämning}</p>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
                         <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
