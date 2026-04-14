@@ -2,12 +2,21 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
-
   const body = await req.json();
-  const { event, data, old_data } = body;
+  const { event, data: payloadData, old_data, payload_too_large } = body;
 
-  // Kör bara om priset faktiskt ändrats
-  if (!old_data || data.pris === old_data.pris) {
+  // Hämta aktuell artikel om payload saknades
+  let data = payloadData;
+  if (payload_too_large || !data) {
+    data = await base44.asServiceRole.entities.Artikel.get(event.entity_id);
+  }
+
+  if (!data) {
+    return Response.json({ message: 'Kunde inte hämta artikeldata.' });
+  }
+
+  // Kör bara om priset faktiskt ändrats (jämför med old_data om tillgängligt)
+  if (old_data && data.pris === old_data.pris) {
     return Response.json({ message: 'Ingen prisändring, hoppar över.' });
   }
 
@@ -21,11 +30,11 @@ Deno.serve(async (req) => {
     return Response.json({ message: 'Inga uttag att uppdatera.' });
   }
 
-  // Uppdatera varje uttag med det nya priset per enhet
+  // Uppdatera varje uttag med det nya priset per enhet × antal
   for (const u of uttag) {
     const nyttTotalt = u.antal * nyttPris;
     await base44.asServiceRole.entities.Uttag.update(u.id, { pris: nyttTotalt });
   }
 
-  return Response.json({ message: `${uttag.length} uttag uppdaterade med nytt pris.` });
+  return Response.json({ message: `${uttag.length} uttag uppdaterade med nytt pris ${nyttPris}.` });
 });
