@@ -362,48 +362,48 @@ export default function UttagLista() {
             <span className="text-xl font-bold text-blue-900">{total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</span>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <table className="w-full">
+            <table className="w-full text-xs">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('datum')}>
-                    <div className="flex items-center gap-2">
+                  <th className="px-2 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('datum')}>
+                    <div className="flex items-center gap-1">
                       Datum
-                      {sortBy === 'datum' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'datum' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('personalNamn')}>
-                    <div className="flex items-center gap-2">
+                  <th className="px-2 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('personalNamn')}>
+                    <div className="flex items-center gap-1">
                       Personal
-                      {sortBy === 'personalNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'personalNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('kundNamn')}>
-                    <div className="flex items-center gap-2">
+                  <th className="px-2 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('kundNamn')}>
+                    <div className="flex items-center gap-1">
                       Kund
-                      {sortBy === 'kundNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'kundNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('artikelNamn')}>
-                    <div className="flex items-center gap-2">
+                  <th className="px-2 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('artikelNamn')}>
+                    <div className="flex items-center gap-1">
                       Artikel
-                      {sortBy === 'artikelNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'artikelNamn' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Streckkod</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('antal')}>
-                    <div className="flex items-center justify-end gap-2">
+                  <th className="px-2 py-2 text-left text-xs font-semibold">Streckkod</th>
+                  <th className="px-2 py-2 text-right text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('antal')}>
+                    <div className="flex items-center justify-end gap-1">
                       Mängd
-                      {sortBy === 'antal' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'antal' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('pris')}>
-                    <div className="flex items-center justify-end gap-2">
+                  <th className="px-2 py-2 text-right text-xs font-semibold cursor-pointer hover:bg-gray-100" onClick={() => handleSort('pris')}>
+                    <div className="flex items-center justify-end gap-1">
                       Pris
-                      {sortBy === 'pris' && (sortOrder === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />)}
+                      {sortBy === 'pris' && (sortOrder === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Ordernummer</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold">Åtgärd</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold">Ordernummer</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold">Åtgärd</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -411,12 +411,12 @@ export default function UttagLista() {
                   const isEditing = editingId === u.id;
                   return (
                   <tr key={u.id} className={isEditing ? 'bg-blue-50' : 'hover:bg-gray-50'}>
-                    <td className="px-4 py-3 text-sm">{u.datum}</td>
-                    <td className="px-4 py-3 text-sm">{u.personalNamn}</td>
-                    <td className="px-4 py-3 text-sm">{u.kundNamn}</td>
-                    <td className="px-4 py-3 text-sm">{u.artikelNamn}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{u.streckkod}</td>
-                    <td className="px-4 py-3 text-right text-sm">
+                    <td className="px-2 py-2 whitespace-nowrap">{u.datum}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">{u.personalNamn}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">{u.kundNamn}</td>
+                    <td className="px-2 py-2">{u.artikelNamn}</td>
+                    <td className="px-2 py-2 text-gray-600 whitespace-nowrap">{u.streckkod}</td>
+                    <td className="px-2 py-2 text-right whitespace-nowrap">
                       {isEditing ? (
                         <input
                           type="number"
@@ -428,7 +428,7 @@ export default function UttagLista() {
                         u.antal
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm font-semibold">
+                    <td className="px-2 py-2 text-right font-semibold whitespace-nowrap">
                       {isEditing ? (
                         <input
                           type="number"
@@ -441,7 +441,7 @@ export default function UttagLista() {
                         u.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr'
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-2 py-2 whitespace-nowrap">
                       {isEditing ? (
                         <input
                           type="text"
@@ -453,7 +453,7 @@ export default function UttagLista() {
                         u.ordernummer || '-'
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-2 py-2 whitespace-nowrap">
                       {isEditing ? (
                         <div className="flex gap-1">
                           <button onClick={handleSaveEdit} className="text-green-600 font-semibold hover:bg-green-50 px-2 py-1 rounded">✓</button>
