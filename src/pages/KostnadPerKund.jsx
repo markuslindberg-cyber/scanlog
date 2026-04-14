@@ -169,7 +169,7 @@ export default function KostnadPerKund() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="namn" angle={-40} textAnchor="end" tick={{ fontSize: 12 }} interval={0} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip formatter={(value) => [`${value.toFixed(2)} kr`, 'Kostnad']} />
+                <Tooltip formatter={(value) => [`${value.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`, 'Kostnad']} />
                 <Bar dataKey="total" radius={[4, 4, 0, 0]}>
                   {data.map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
@@ -190,7 +190,7 @@ export default function KostnadPerKund() {
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <span className="flex-1 text-left font-medium text-sm">{item.namn}</span>
                 <div className="text-right">
-                  <div className="font-bold text-sm">{item.total.toFixed(2)} kr</div>
+                  <div className="font-bold text-sm">{item.total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</div>
                   <div className="text-xs text-gray-400">{total > 0 ? ((item.total / total) * 100).toFixed(1) : 0}%</div>
                 </div>
               </button>

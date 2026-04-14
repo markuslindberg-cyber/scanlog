@@ -113,8 +113,8 @@ export default function KundUttag() {
                     <td className="px-4 py-3">{u.datum}</td>
                     <td className="px-4 py-3">{u.artikel?.benämning || '-'}</td>
                     <td className="px-4 py-3 text-right">{u.antal}</td>
-                    <td className="px-4 py-3 text-right">{(u.pris / u.antal).toFixed(2)} kr</td>
-                    <td className="px-4 py-3 text-right font-semibold">{u.pris.toFixed(2)} kr</td>
+                    <td className="px-4 py-3 text-right">{(u.pris / u.antal).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
+                    <td className="px-4 py-3 text-right font-semibold">{u.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
                   </tr>
                 ))}
               </tbody>
@@ -123,7 +123,7 @@ export default function KundUttag() {
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-lg font-bold text-blue-900">
-              Totalt: {total.toFixed(2)} kr
+              Totalt: {total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
             </p>
           </div>
         </>

@@ -438,7 +438,7 @@ export default function UttagLista() {
                           className="px-2 py-1 border border-gray-300 rounded w-20 text-right"
                         />
                       ) : (
-                        u.pris.toFixed(2) + ' kr'
+                        u.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr'
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm">

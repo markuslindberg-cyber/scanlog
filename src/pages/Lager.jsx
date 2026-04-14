@@ -460,7 +460,7 @@ export default function Lager() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
-                        <td className="px-4 py-3 text-right">{artikel.pris} kr</td>
+                        <td className="px-4 py-3 text-right">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
                         <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
                         <td className="px-4 py-3 text-right">{totalUttag}</td>
                         <td className={`px-4 py-3 text-right ${saldoColor}`}>{saldo}</td>
