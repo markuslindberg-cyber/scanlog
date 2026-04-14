@@ -21,10 +21,10 @@ export default function UttagLista() {
   const loadData = async () => {
     try {
       const [uttagData, personalData, kunderData, artiklarData] = await Promise.all([
-        base44.entities.Uttag.list(),
+        base44.entities.Uttag.list()null, dataLimit,
         base44.entities.Personal.list(),
         base44.entities.Kund.list(),
-        base44.entities.Artikel.list()
+        base44.entities.Artikel.list(null, dataLimit)
       ]);
       setUttag(uttagData);
       setPersonal(personalData);
