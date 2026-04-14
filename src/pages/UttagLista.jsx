@@ -331,7 +331,7 @@ export default function UttagLista() {
         <>
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
             <span className="text-sm text-blue-700 font-medium">Totalt {sorted.length} uttag</span>
-            <span className="text-xl font-bold text-blue-900">{total.toFixed(2)} kr</span>
+            <span className="text-xl font-bold text-blue-900">{total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</span>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <table className="w-full">
