@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Calendar, ArrowUp, ArrowDown, Upload, FileDown } from 'lucide-react';
+import { Download, Calendar, ArrowUp, ArrowDown, Upload, FileDown, ChevronDown, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 
 export default function UttagLista() {
@@ -13,6 +15,7 @@ export default function UttagLista() {
   const [sortBy, setSortBy] = useState('datum');
   const [sortOrder, setSortOrder] = useState('desc');
   const [filterPeriod, setFilterPeriod] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedKundIds, setSelectedKundIds] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -48,7 +51,7 @@ export default function UttagLista() {
   const getStreckkod = (id) => artiklar.find(a => a.id === id)?.streckkod || '-';
 
   const filtered = uttag
-    .filter(u => u.månad === filterPeriod)
+    .filter(u => u.månad === filterPeriod && (selectedKundIds.length === 0 || selectedKundIds.includes(u.kund_id)))
     .map(u => ({
       ...u,
       personalNamn: getPersonalNamn(u.personal_id),
@@ -246,6 +249,34 @@ export default function UttagLista() {
           onChange={(e) => setFilterPeriod(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg"
         />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              {selectedKundIds.length === 0 ? 'Alla kunder' : `${selectedKundIds.length} kund${selectedKundIds.length > 1 ? 'er' : ''} vald${selectedKundIds.length > 1 ? 'a' : ''}`}
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-2" align="start">
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {kunder.map(k => (
+                <label key={k.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                  <Checkbox
+                    checked={selectedKundIds.includes(k.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedKundIds(prev => checked ? [...prev, k.id] : prev.filter(id => id !== k.id));
+                    }}
+                  />
+                  <span className="text-sm">{k.namn}</span>
+                </label>
+              ))}
+            </div>
+            {selectedKundIds.length > 0 && (
+              <button onClick={() => setSelectedKundIds([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                <X className="w-3 h-3" /> Rensa val
+              </button>
+            )}
+          </PopoverContent>
+        </Popover>
         <div className="flex items-center gap-2">
           <label className="text-sm font-semibold whitespace-nowrap">Visa antal:</label>
           <select
