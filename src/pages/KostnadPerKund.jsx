@@ -159,7 +159,7 @@ export default function KostnadPerKund() {
           {/* Totalt summary */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
             <span className="text-sm text-blue-700 font-medium">Totalt alla kunder</span>
-            <span className="text-xl font-bold text-blue-900">{total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</span>
+            <span className="text-xl font-bold text-blue-900">{total.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</span>
           </div>
 
           {/* Chart */}
@@ -169,7 +169,7 @@ export default function KostnadPerKund() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="namn" angle={-40} textAnchor="end" tick={{ fontSize: 12 }} interval={0} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip formatter={(value) => [`${value.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`, 'Kostnad']} />
+                <Tooltip formatter={(value) => [`${value.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr`, 'Kostnad']} />
                 <Bar dataKey="total" radius={[4, 4, 0, 0]}>
                   {data.map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
@@ -190,7 +190,7 @@ export default function KostnadPerKund() {
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <span className="flex-1 text-left font-medium text-sm">{item.namn}</span>
                 <div className="text-right">
-                  <div className="font-bold text-sm">{item.total.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</div>
+                  <div className="font-bold text-sm">{item.total.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</div>
                   <div className="text-xs text-gray-400">{total > 0 ? ((item.total / total) * 100).toFixed(1) : 0}%</div>
                 </div>
               </button>

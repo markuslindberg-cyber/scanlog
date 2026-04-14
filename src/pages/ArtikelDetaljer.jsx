@@ -198,7 +198,7 @@ export default function ArtikelDetaljer() {
             </div>
             <div>
               <p className="text-sm text-gray-600">Pris</p>
-              <p className="text-lg font-semibold">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</p>
+              <p className="text-lg font-semibold">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Inköpsdatum</p>
@@ -427,7 +427,7 @@ export default function ArtikelDetaljer() {
                           />
                         </td>
                         <td className="px-4 py-3 text-right text-gray-600">
-                              {(inköpForm.antal * inköpForm.pris).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
+                                {(inköpForm.antal * inköpForm.pris).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr
                         </td>
                         <td className="px-4 py-3 text-right space-x-2">
                           <button
@@ -448,8 +448,8 @@ export default function ArtikelDetaljer() {
                       <>
                         <td className="px-4 py-3">{i.datum}</td>
                         <td className="px-4 py-3 text-right">{i.antal}</td>
-                        <td className="px-4 py-3 text-right">{i.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
-                        <td className="px-4 py-3 text-right text-gray-600">{(i.antal * i.pris).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
+                        <td className="px-4 py-3 text-right">{i.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</td>
+                        <td className="px-4 py-3 text-right text-gray-600">{(i.antal * i.pris).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</td>
                         <td className="px-4 py-3 text-right space-x-2">
                           <button
                             onClick={() => handleEditInköp(i)}
@@ -499,7 +499,7 @@ export default function ArtikelDetaljer() {
                     <td className="px-4 py-3">{getKundNamn(uttag.kund_id)}</td>
                     <td className="px-4 py-3">{uttag.ordernummer || '-'}</td>
                     <td className="px-4 py-3 text-right">{uttag.antal}</td>
-                    <td className="px-4 py-3 text-right">{uttag.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
+                    <td className="px-4 py-3 text-right">{uttag.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</td>
                   </tr>
                 ))}
               </tbody>

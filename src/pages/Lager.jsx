@@ -283,7 +283,7 @@ export default function Lager() {
       {/* Totalt lagervärde */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
         <span className="text-sm text-blue-700 font-medium">Totalt lagervärde ({sorted.length} artiklar)</span>
-        <span className="text-xl font-bold text-blue-900">{totaltLagervärde.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</span>
+        <span className="text-xl font-bold text-blue-900">{totaltLagervärde.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</span>
       </div>
 
       {/* Filterflikar */}
@@ -460,7 +460,7 @@ export default function Lager() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
-                        <td className="px-4 py-3 text-right">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr</td>
+                        <td className="px-4 py-3 text-right">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</td>
                         <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
                         <td className="px-4 py-3 text-right">{totalUttag}</td>
                         <td className={`px-4 py-3 text-right ${saldoColor}`}>{saldo}</td>
