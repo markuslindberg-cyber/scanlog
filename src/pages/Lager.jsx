@@ -18,13 +18,14 @@ export default function Lager() {
   const [sortOrder, setSortOrder] = useState('asc');
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [dataLimit, setDataLimit] = useState(100);
   const fileInputRef = useRef(null);
 
-  const loadData = async () => {
+  const loadData = async (limit = dataLimit) => {
     try {
       const [artiklarData, uttagData] = await Promise.all([
-        base44.entities.Artikel.list(),
-        base44.entities.Uttag.list()
+        base44.entities.Artikel.list(null, limit === -1 ? 10000 : limit),
+        base44.entities.Uttag.list(null, 5000)
       ]);
       setArtiklar(artiklarData);
       setUttag(uttagData);
@@ -36,8 +37,8 @@ export default function Lager() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(dataLimit);
+  }, [dataLimit]);
 
   const handleDownloadTemplate = async () => {
     try {
@@ -252,6 +253,20 @@ export default function Lager() {
             onChange={handleExcelUpload}
             className="hidden"
           />
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold whitespace-nowrap">Visa antal:</label>
+            <select
+              value={dataLimit}
+              onChange={(e) => setDataLimit(Number(e.target.value))}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value={100}>100</option>
+              <option value={250}>250</option>
+              <option value={500}>500</option>
+              <option value={1000}>1 000</option>
+              <option value={-1}>Alla</option>
+            </select>
+          </div>
           <Button onClick={() => setShowDialog(true)} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" /> Lägg till artikel
           </Button>
