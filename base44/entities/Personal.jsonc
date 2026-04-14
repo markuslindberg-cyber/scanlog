@@ -5,6 +5,15 @@
     "namn": {
       "type": "string",
       "description": "Personalens namn"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin lokalv\u00e5rd",
+        "lokalv\u00e5rdare"
+      ],
+      "description": "Personalens roll",
+      "default": "lokalv\u00e5rdare"
     }
   },
   "required": [

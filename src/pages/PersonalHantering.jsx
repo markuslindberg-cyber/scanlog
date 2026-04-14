@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 export default function PersonalHantering() {
   const [personal, setPersonal] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ namn: '' });
+  const [form, setForm] = useState({ namn: '', role: 'lokalvårdare' });
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
@@ -33,9 +33,9 @@ export default function PersonalHantering() {
     }
 
     try {
-      await base44.entities.Personal.create({ namn: form.namn });
+      await base44.entities.Personal.create({ namn: form.namn, role: form.role });
       toast.success('Personal tillagd!');
-      setForm({ namn: '' });
+      setForm({ namn: '', role: 'lokalvårdare' });
       loadPersonal();
     } catch (error) {
       toast.error('Kunde inte lägga till personal');
@@ -56,7 +56,7 @@ export default function PersonalHantering() {
 
   const handleEdit = (p) => {
     setEditingId(p.id);
-    setForm({ namn: p.namn });
+    setForm({ namn: p.namn, role: p.role || 'lokalvårdare' });
   };
 
   const handleSaveEdit = async (e) => {
@@ -67,10 +67,10 @@ export default function PersonalHantering() {
     }
 
     try {
-      await base44.entities.Personal.update(editingId, { namn: form.namn });
+      await base44.entities.Personal.update(editingId, { namn: form.namn, role: form.role });
       toast.success('Personal uppdaterad!');
       setEditingId(null);
-      setForm({ namn: '' });
+      setForm({ namn: '', role: 'lokalvårdare' });
       loadPersonal();
     } catch (error) {
       toast.error('Kunde inte uppdatera personal');
@@ -85,14 +85,25 @@ export default function PersonalHantering() {
 
       <form onSubmit={editingId ? handleSaveEdit : handleAdd} className="bg-white rounded-lg p-6 border border-gray-200 space-y-4">
         <h2 className="text-xl font-semibold">{editingId ? 'Redigera personal' : 'Lägg till personal'}</h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={form.namn}
-            onChange={(e) => setForm({ namn: e.target.value })}
-            placeholder="Namn"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-          />
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={form.namn}
+              onChange={(e) => setForm({ ...form, namn: e.target.value })}
+              placeholder="Namn"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="admin lokalvård">Admin lokalvård</option>
+              <option value="lokalvårdare">Lokalvårdare</option>
+            </select>
           <Button type="submit" className="bg-blue-600 hover:bg-blue-700 gap-2">
             {editingId ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {editingId ? 'Uppdatera' : 'Lägg till'}
@@ -102,14 +113,15 @@ export default function PersonalHantering() {
               type="button"
               onClick={() => {
                 setEditingId(null);
-                setForm({ namn: '' });
+                setForm({ namn: '', role: 'lokalvårdare' });
               }}
               variant="outline"
             >
               <X className="w-4 h-4" />
             </Button>
           )}
-        </div>
+          </div>
+          </div>
       </form>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -118,16 +130,26 @@ export default function PersonalHantering() {
         ) : (
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Namn</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold">Åtgärd</th>
-              </tr>
+             <tr>
+               <th className="px-4 py-3 text-left text-sm font-semibold">Namn</th>
+               <th className="px-4 py-3 text-left text-sm font-semibold">Roll</th>
+               <th className="px-4 py-3 text-right text-sm font-semibold">Åtgärd</th>
+             </tr>
             </thead>
             <tbody className="divide-y">
               {personal.map(p => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">{p.namn}</td>
-                  <td className="px-4 py-3 text-right space-x-2">
+               <tr key={p.id} className="hover:bg-gray-50">
+                 <td className="px-4 py-3">{p.namn}</td>
+                 <td className="px-4 py-3">
+                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                     p.role === 'admin lokalvård' 
+                       ? 'bg-red-100 text-red-700' 
+                       : 'bg-blue-100 text-blue-700'
+                   }`}>
+                     {p.role === 'admin lokalvård' ? 'Admin lokalvård' : 'Lokalvårdare'}
+                   </span>
+                 </td>
+                 <td className="px-4 py-3 text-right space-x-2">
                     <button
                       onClick={() => handleEdit(p)}
                       className="text-blue-600 hover:bg-blue-50 p-2 rounded-lg inline-flex"
