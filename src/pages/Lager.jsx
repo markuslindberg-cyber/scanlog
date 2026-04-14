@@ -166,6 +166,7 @@ export default function Lager() {
     if (!matchSearch) return false;
     if (filterTyp === 'ejILager') return calculateSaldo(a) === 0;
     if (filterTyp === 'utgående') return !!a.utgående;
+    if (filterTyp === 'utanPris') return !a.pris || a.pris === 0;
     return true;
   });
 
@@ -237,6 +238,7 @@ export default function Lager() {
     const saldo = calculateSaldo(a);
     return saldo > 0 && saldo < (a.lagertröskelvärde || 10);
   }).length;
+  const utanPris = unikArtiklar.filter(a => !a.pris || a.pris === 0).length;
 
   if (loading) return <div className="flex justify-center p-8">Laddar...</div>;
 
@@ -291,21 +293,36 @@ export default function Lager() {
         {[
           { key: 'alla', label: 'Alla artiklar' },
           { key: 'ejILager', label: `Slut i lager (${tomma})` },
-          { key: 'utgående', label: 'Utgående' }
+          { key: 'utgående', label: 'Utgående' },
+          ...(utanPris > 0 ? [{ key: 'utanPris', label: `⚠️ Saknar pris (${utanPris})` }] : [])
         ].map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setFilterTyp(key)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               filterTyp === key
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? key === 'utanPris' ? 'bg-purple-700 text-white' : 'bg-gray-800 text-white'
+                : key === 'utanPris' ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             {label}
           </button>
         ))}
       </div>
+
+      {/* Varning: artiklar utan pris */}
+      {utanPris > 0 && (
+        <div className="flex items-center gap-2 bg-purple-50 border border-purple-300 rounded-lg px-4 py-2.5 text-purple-800">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-purple-600" />
+          <span className="text-sm font-medium">{utanPris} artikel{utanPris > 1 ? 'ar' : ''} saknar pris — dessa påverkar inte lagervärdet korrekt.</span>
+          <button
+            onClick={() => setFilterTyp('utanPris')}
+            className="ml-auto text-xs font-semibold text-purple-700 hover:text-purple-900 underline whitespace-nowrap"
+          >
+            Visa dessa
+          </button>
+        </div>
+      )}
 
       {/* Status badges */}
       {(tomma > 0 || lågtSaldo > 0) && (
@@ -323,6 +340,7 @@ export default function Lager() {
             </div>
           )}
           <div className="flex items-center gap-3 ml-auto text-xs text-gray-400">
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-purple-100 border border-purple-200 inline-block"></span>Saknar pris</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-100 border border-yellow-200 inline-block"></span>Lågt saldo</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-100 border border-red-200 inline-block"></span>Slut i lager</span>
           </div>
@@ -374,9 +392,12 @@ export default function Lager() {
                   .filter(u => u.artikel_id === artikel.id)
                   .reduce((sum, u) => sum + u.antal, 0);
                 
+                const utanPrisRad = !artikel.pris || artikel.pris === 0;
                 let saldoColor = 'text-gray-900';
                 let saldoBg = '';
-                if (saldo === 0) {
+                if (utanPrisRad) {
+                  saldoBg = 'bg-purple-50';
+                } else if (saldo === 0) {
                   saldoColor = 'text-red-600 font-semibold';
                   saldoBg = 'bg-red-50';
                 } else if (saldo < (artikel.lagertröskelvärde || 10)) {
@@ -460,7 +481,12 @@ export default function Lager() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{artikel.streckkod}</td>
-                        <td className="px-4 py-3 text-right">{artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr</td>
+                        <td className="px-4 py-3 text-right">
+                          {utanPrisRad
+                            ? <span className="text-purple-600 font-semibold text-xs bg-purple-100 px-2 py-0.5 rounded">Saknar pris</span>
+                            : `${artikel.pris.toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kr`
+                          }
+                        </td>
                         <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
                         <td className="px-4 py-3 text-right">{totalUttag}</td>
                         <td className={`px-4 py-3 text-right ${saldoColor}`}>{saldo}</td>
