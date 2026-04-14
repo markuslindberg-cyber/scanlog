@@ -241,105 +241,87 @@ export default function UttagLista() {
   if (loading) return <div className="flex justify-center p-8">Laddar...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-6">
-      <h1 className="text-3xl font-bold">📋 Samtliga uttag</h1>
-
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-          <Calendar className="w-4 h-4 text-gray-500" />
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Period</span>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors">
-                {selectedPeriods.length === 0 ? 'Alla' : `${selectedPeriods.length} vald${selectedPeriods.length > 1 ? 'a' : ''}`}
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-2" align="start">
-              <div className="space-y-1 max-h-60 overflow-y-auto">
-                {availablePeriods.map(p => (
-                  <label key={p} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
-                    <Checkbox
-                      checked={selectedPeriods.includes(p)}
-                      onCheckedChange={(checked) => {
-                        setSelectedPeriods(prev => checked ? [...prev, p] : prev.filter(id => id !== p));
-                      }}
-                    />
-                    <span className="text-sm">{p}</span>
-                  </label>
-                ))}
-              </div>
-              {selectedPeriods.length > 0 && (
-                <button onClick={() => setSelectedPeriods([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
-                  <X className="w-3 h-3" /> Rensa
+    <div className="max-w-6xl mx-auto p-4 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-2xl font-bold">📋 Samtliga uttag</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Period filter */}
+          <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            <Calendar className="w-4 h-4 text-gray-400" />
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Period</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors">
+                  {selectedPeriods.length === 0 ? 'Alla' : `${selectedPeriods.length} vald${selectedPeriods.length > 1 ? 'a' : ''}`}
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
-              )}
-            </PopoverContent>
-          </Popover>
-        </div>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              {selectedKundIds.length === 0 ? 'Alla kunder' : `${selectedKundIds.length} kund${selectedKundIds.length > 1 ? 'er' : ''} vald${selectedKundIds.length > 1 ? 'a' : ''}`}
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-2" align="start">
-            <div className="space-y-1 max-h-60 overflow-y-auto">
-              {kunder.map(k => (
-                <label key={k.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
-                  <Checkbox
-                    checked={selectedKundIds.includes(k.id)}
-                    onCheckedChange={(checked) => {
-                      setSelectedKundIds(prev => checked ? [...prev, k.id] : prev.filter(id => id !== k.id));
-                    }}
-                  />
-                  <span className="text-sm">{k.namn}</span>
-                </label>
-              ))}
-            </div>
-            {selectedKundIds.length > 0 && (
-              <button onClick={() => setSelectedKundIds([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
-                <X className="w-3 h-3" /> Rensa val
-              </button>
-            )}
-          </PopoverContent>
-        </Popover>
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-semibold whitespace-nowrap">Visa antal:</label>
-          <select
-            value={dataLimit}
-            onChange={(e) => setDataLimit(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-          >
-            <option value={100}>100</option>
-            <option value={250}>250</option>
-            <option value={500}>500</option>
-            <option value={1000}>1 000</option>
-            <option value={-1}>Alla</option>
-          </select>
-        </div>
-        <div className="flex gap-2 ml-auto">
-          <Button onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
-            <FileDown className="w-4 h-4 mr-2" /> Ladda ned mall
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="end">
+                <div className="space-y-1 max-h-60 overflow-y-auto">
+                  {availablePeriods.map(p => (
+                    <label key={p} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                      <Checkbox checked={selectedPeriods.includes(p)} onCheckedChange={(checked) => setSelectedPeriods(prev => checked ? [...prev, p] : prev.filter(id => id !== p))} />
+                      <span className="text-sm">{p}</span>
+                    </label>
+                  ))}
+                </div>
+                {selectedPeriods.length > 0 && (
+                  <button onClick={() => setSelectedPeriods([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                    <X className="w-3 h-3" /> Rensa
+                  </button>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
+          {/* Kund filter */}
+          <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Kund</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors">
+                  {selectedKundIds.length === 0 ? 'Alla' : `${selectedKundIds.length} vald${selectedKundIds.length > 1 ? 'a' : ''}`}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-60 p-2" align="end">
+                <div className="space-y-1 max-h-60 overflow-y-auto">
+                  {kunder.map(k => (
+                    <label key={k.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                      <Checkbox checked={selectedKundIds.includes(k.id)} onCheckedChange={(checked) => setSelectedKundIds(prev => checked ? [...prev, k.id] : prev.filter(id => id !== k.id))} />
+                      <span className="text-sm">{k.namn}</span>
+                    </label>
+                  ))}
+                </div>
+                {selectedKundIds.length > 0 && (
+                  <button onClick={() => setSelectedKundIds([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                    <X className="w-3 h-3" /> Rensa
+                  </button>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
+          {/* Visa antal */}
+          <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Visa</span>
+            <select value={dataLimit} onChange={(e) => setDataLimit(Number(e.target.value))} className="text-sm font-medium text-gray-800 bg-transparent border-none outline-none cursor-pointer">
+              <option value={100}>100</option>
+              <option value={250}>250</option>
+              <option value={500}>500</option>
+              <option value={1000}>1 000</option>
+              <option value={-1}>Alla</option>
+            </select>
+          </div>
+          <Button size="sm" onClick={handleDownloadTemplate} className="bg-purple-600 hover:bg-purple-700">
+            <FileDown className="w-4 h-4 mr-1" /> Mall
           </Button>
-          <Button 
-            onClick={handleImportClick}
-            disabled={uploading}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Upload className="w-4 h-4 mr-2" /> Importera
+          <Button size="sm" onClick={handleImportClick} disabled={uploading} className="bg-blue-600 hover:bg-blue-700">
+            <Upload className="w-4 h-4 mr-1" /> Importera
           </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            onChange={handleExcelUpload}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleExcelUpload} className="hidden" />
           {sorted.length > 0 && (
-            <Button onClick={handleExport} className="bg-green-600 hover:bg-green-700">
-              <Download className="w-4 h-4 mr-2" /> Exportera CSV
+            <Button size="sm" onClick={handleExport} className="bg-green-600 hover:bg-green-700">
+              <Download className="w-4 h-4 mr-1" /> CSV
             </Button>
           )}
         </div>
@@ -347,6 +329,10 @@ export default function UttagLista() {
 
       {sorted.length > 0 ? (
         <>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+            <span className="text-sm text-blue-700 font-medium">Totalt {sorted.length} uttag</span>
+            <span className="text-xl font-bold text-blue-900">{total.toFixed(2)} kr</span>
+          </div>
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
@@ -456,11 +442,7 @@ export default function UttagLista() {
             </table>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-lg font-bold text-blue-900">
-              Totalt {sorted.length} uttag: {total.toFixed(2)} kr
-            </p>
-          </div>
+
         </>
       ) : (
         <div className="text-center py-8 text-gray-500">Ingen uttag för denna period</div>
