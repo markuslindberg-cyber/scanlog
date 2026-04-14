@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, AlertTriangle, Plus, Upload, FileDown, ArrowUp, ArrowDown, Edit2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import AddArtikelDialog from '@/components/AddArtikelDialog';
 import { toast } from 'sonner';
@@ -205,7 +206,8 @@ export default function Lager() {
     setEditingId(artikel.id);
     setEditForm({
       benämning: artikel.benämning,
-      pris: artikel.pris
+      pris: artikel.pris,
+      utgående: !!artikel.utgående
     });
   };
 
@@ -214,7 +216,8 @@ export default function Lager() {
     try {
       await base44.entities.Artikel.update(editingId, {
         benämning: editForm.benämning,
-        pris: parseFloat(editForm.pris)
+        pris: parseFloat(editForm.pris),
+        utgående: editForm.utgående
       });
       toast.success('Artikel uppdaterad!');
       setEditingId(null);
@@ -410,19 +413,28 @@ export default function Lager() {
                         </td>
                         <td className="px-4 py-3 text-right">{artikel.antal_inköpta}</td>
                         <td className="px-4 py-3 text-right">{totalUttag}</td>
-                        <td className="px-4 py-3 text-right space-x-2">
-                          <button
-                            onClick={handleSaveEdit}
-                            className="text-green-600 hover:bg-green-50 p-1 rounded font-semibold"
-                          >
-                            ✓
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            className="text-red-600 hover:bg-red-50 p-1 rounded font-semibold"
-                          >
-                            ✕
-                          </button>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-3">
+                            <label className="flex items-center gap-1.5 cursor-pointer text-sm text-orange-700">
+                              <Checkbox
+                                checked={editForm.utgående}
+                                onCheckedChange={(checked) => setEditForm({ ...editForm, utgående: !!checked })}
+                              />
+                              Utgående
+                            </label>
+                            <button
+                              onClick={handleSaveEdit}
+                              className="text-green-600 hover:bg-green-50 p-1 rounded font-semibold"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="text-red-600 hover:bg-red-50 p-1 rounded font-semibold"
+                            >
+                              ✕
+                            </button>
+                          </div>
                         </td>
                       </>
                     ) : (
