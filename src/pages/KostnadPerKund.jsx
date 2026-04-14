@@ -13,7 +13,7 @@ export default function KostnadPerKund() {
   const [allData, setAllData] = useState([]);
   const [allCustomers, setAllCustomers] = useState([]);
   const [availablePeriods, setAvailablePeriods] = useState([]);
-  const [selectedPeriods, setSelectedPeriods] = useState([new Date().toISOString().slice(0, 7)]);
+  const [selectedPeriods, setSelectedPeriods] = useState([]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
