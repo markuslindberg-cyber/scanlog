@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Download, ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function KostnadPerKund() {
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [allCustomers, setAllCustomers] = useState([]);
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
-  const [selectedKund, setSelectedKund] = useState(null);
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const uttag = await base44.entities.Uttag.list();
-        const kunder = await base44.entities.Kund.list();
+        const [uttag, kunder] = await Promise.all([
+          base44.entities.Uttag.list(),
+          base44.entities.Kund.list()
+        ]);
+        setAllCustomers(kunder);
         
         const filtered = uttag.filter(u => u.månad === period);
         
@@ -31,7 +37,7 @@ export default function KostnadPerKund() {
         });
 
         const sorted = Object.values(costMap).sort((a, b) => b.total - a.total);
-        setData(sorted);
+        setAllData(sorted);
       } catch (error) {
         toast.error('Kunde inte ladda kostnaddata');
       } finally {
@@ -40,6 +46,10 @@ export default function KostnadPerKund() {
     };
     loadData();
   }, [period]);
+
+  const data = selectedCustomerIds.length === 0
+    ? allData
+    : allData.filter(d => selectedCustomerIds.includes(d.kund_id));
 
   const total = data.reduce((sum, item) => sum + item.total, 0);
 
@@ -59,7 +69,7 @@ export default function KostnadPerKund() {
     <div className="max-w-6xl mx-auto p-4 space-y-6">
       <h1 className="text-3xl font-bold">💰 Kostnad per kund</h1>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <label className="font-semibold">Period:</label>
         <input
           type="month"
@@ -67,6 +77,34 @@ export default function KostnadPerKund() {
           onChange={(e) => setPeriod(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg"
         />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              {selectedCustomerIds.length === 0 ? 'Alla kunder' : `${selectedCustomerIds.length} kund${selectedCustomerIds.length > 1 ? 'er' : ''} vald${selectedCustomerIds.length > 1 ? 'a' : ''}`}
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-2" align="start">
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {allCustomers.map(k => (
+                <label key={k.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                  <Checkbox
+                    checked={selectedCustomerIds.includes(k.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedCustomerIds(prev => checked ? [...prev, k.id] : prev.filter(id => id !== k.id));
+                    }}
+                  />
+                  <span className="text-sm">{k.namn}</span>
+                </label>
+              ))}
+            </div>
+            {selectedCustomerIds.length > 0 && (
+              <button onClick={() => setSelectedCustomerIds([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                <X className="w-3 h-3" /> Rensa val
+              </button>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {data.length > 0 ? (
