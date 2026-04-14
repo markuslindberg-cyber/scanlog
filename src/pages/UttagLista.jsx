@@ -17,6 +17,7 @@ export default function UttagLista() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedPeriods, setSelectedPeriods] = useState([]);
   const [selectedKundIds, setSelectedKundIds] = useState([]);
+  const [selectedPersonalIds, setSelectedPersonalIds] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
@@ -57,7 +58,7 @@ export default function UttagLista() {
   );
 
   const filtered = uttag
-    .filter(u => (selectedPeriods.length === 0 || selectedPeriods.includes(u.månad)) && (selectedKundIds.length === 0 || selectedKundIds.includes(u.kund_id)))
+    .filter(u => (selectedPeriods.length === 0 || selectedPeriods.includes(u.månad)) && (selectedKundIds.length === 0 || selectedKundIds.includes(u.kund_id)) && (selectedPersonalIds.length === 0 || selectedPersonalIds.includes(u.personal_id)))
     .map(u => ({
       ...u,
       personalNamn: getPersonalNamn(u.personal_id),
@@ -268,6 +269,33 @@ export default function UttagLista() {
                 </div>
                 {selectedPeriods.length > 0 && (
                   <button onClick={() => setSelectedPeriods([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                    <X className="w-3 h-3" /> Rensa
+                  </button>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
+          {/* Personal filter */}
+          <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Personal</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors">
+                  {selectedPersonalIds.length === 0 ? 'Alla' : `${selectedPersonalIds.length} vald${selectedPersonalIds.length > 1 ? 'a' : ''}`}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-52 p-2" align="end">
+                <div className="space-y-1 max-h-60 overflow-y-auto">
+                  {personal.map(p => (
+                    <label key={p.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                      <Checkbox checked={selectedPersonalIds.includes(p.id)} onCheckedChange={(checked) => setSelectedPersonalIds(prev => checked ? [...prev, p.id] : prev.filter(id => id !== p.id))} />
+                      <span className="text-sm">{p.namn}</span>
+                    </label>
+                  ))}
+                </div>
+                {selectedPersonalIds.length > 0 && (
+                  <button onClick={() => setSelectedPersonalIds([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
                     <X className="w-3 h-3" /> Rensa
                   </button>
                 )}
