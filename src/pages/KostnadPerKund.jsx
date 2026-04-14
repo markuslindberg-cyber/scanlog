@@ -12,7 +12,8 @@ export default function KostnadPerKund() {
   const navigate = useNavigate();
   const [allData, setAllData] = useState([]);
   const [allCustomers, setAllCustomers] = useState([]);
-  const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
+  const [availablePeriods, setAvailablePeriods] = useState([]);
+  const [selectedPeriods, setSelectedPeriods] = useState([new Date().toISOString().slice(0, 7)]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,8 +25,11 @@ export default function KostnadPerKund() {
           base44.entities.Kund.list()
         ]);
         setAllCustomers(kunder);
+
+        const periods = [...new Set(uttag.map(u => u.månad).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+        setAvailablePeriods(periods);
         
-        const filtered = uttag.filter(u => u.månad === period);
+        const filtered = uttag.filter(u => selectedPeriods.length === 0 || selectedPeriods.includes(u.månad));
         
         const costMap = {};
         filtered.forEach(u => {
@@ -45,7 +49,7 @@ export default function KostnadPerKund() {
       }
     };
     loadData();
-  }, [period]);
+  }, [selectedPeriods]);
 
   const data = selectedCustomerIds.length === 0
     ? allData
@@ -59,7 +63,7 @@ export default function KostnadPerKund() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `kostnad_${period}.csv`;
+    a.download = `kostnad_${selectedPeriods.length > 0 ? selectedPeriods.join('_') : 'alla'}.csv`;
     a.click();
   };
 
@@ -71,12 +75,34 @@ export default function KostnadPerKund() {
 
       <div className="flex items-center gap-4 flex-wrap">
         <label className="font-semibold">Period:</label>
-        <input
-          type="month"
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              {selectedPeriods.length === 0 ? 'Alla perioder' : `${selectedPeriods.length} period${selectedPeriods.length > 1 ? 'er' : ''} vald${selectedPeriods.length > 1 ? 'a' : ''}`}
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-52 p-2" align="start">
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {availablePeriods.map(p => (
+                <label key={p} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer">
+                  <Checkbox
+                    checked={selectedPeriods.includes(p)}
+                    onCheckedChange={(checked) => {
+                      setSelectedPeriods(prev => checked ? [...prev, p] : prev.filter(id => id !== p));
+                    }}
+                  />
+                  <span className="text-sm">{p}</span>
+                </label>
+              ))}
+            </div>
+            {selectedPeriods.length > 0 && (
+              <button onClick={() => setSelectedPeriods([])} className="mt-2 w-full text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1">
+                <X className="w-3 h-3" /> Rensa val
+              </button>
+            )}
+          </PopoverContent>
+        </Popover>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
