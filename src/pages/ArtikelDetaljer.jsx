@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -49,7 +50,8 @@ export default function ArtikelDetaljer() {
         pris: huvudArtikel.pris,
         inköpsdatum: huvudArtikel.inköpsdatum,
         antal_inköpta: huvudArtikel.antal_inköpta,
-        lagertröskelvärde: huvudArtikel.lagertröskelvärde || 10
+        lagertröskelvärde: huvudArtikel.lagertröskelvärde || 10,
+        utgående: huvudArtikel.utgående || false
       });
 
       const relateradeUttag = uttagData.filter(u => 
@@ -78,7 +80,8 @@ export default function ArtikelDetaljer() {
         pris: parseFloat(form.pris),
         inköpsdatum: form.inköpsdatum,
         antal_inköpta: parseInt(form.antal_inköpta),
-        lagertröskelvärde: parseInt(form.lagertröskelvärde)
+        lagertröskelvärde: parseInt(form.lagertröskelvärde),
+        utgående: form.utgående
       });
       toast.success('Artikel uppdaterad!');
       setEditing(false);
@@ -219,6 +222,12 @@ export default function ArtikelDetaljer() {
                 {saldo}
               </p>
             </div>
+            <div>
+              <p className="text-sm text-gray-600">Status</p>
+              <p className="text-lg font-semibold">
+                {artikel.utgående ? <span className="text-orange-600">Utgående</span> : <span className="text-green-600">Aktiv</span>}
+              </p>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -280,6 +289,16 @@ export default function ArtikelDetaljer() {
                 onChange={(e) => setForm({ ...form, lagertröskelvärde: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="utgående-edit"
+                checked={form.utgående}
+                onCheckedChange={(checked) => setForm({ ...form, utgående: !!checked })}
+              />
+              <label htmlFor="utgående-edit" className="text-sm font-semibold cursor-pointer">
+                Utgående artikel (köps inte längre in)
+              </label>
             </div>
             <div className="flex gap-2 pt-4">
               <Button

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { X, Info, Scan } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
@@ -15,7 +16,8 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
     pris: '',
     inköpsdatum: new Date().toISOString().split('T')[0],
     antal_inköpta: '',
-    lagertröskelvärde: '10'
+    lagertröskelvärde: '10',
+    utgående: false
   });
 
   useEffect(() => {
@@ -78,7 +80,8 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
         pris: parseFloat(form.pris),
         inköpsdatum: form.inköpsdatum,
         antal_inköpta: parseInt(form.antal_inköpta),
-        lagertröskelvärde: parseInt(form.lagertröskelvärde)
+        lagertröskelvärde: parseInt(form.lagertröskelvärde),
+        utgående: form.utgående
       });
       toast.success('Artikel tillagd!');
       setForm({
@@ -88,7 +91,8 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
         pris: '',
         inköpsdatum: new Date().toISOString().split('T')[0],
         antal_inköpta: '',
-        lagertröskelvärde: '10'
+        lagertröskelvärde: '10',
+        utgående: false
       });
       onSuccess();
     } catch (error) {
@@ -216,6 +220,17 @@ export default function AddArtikelDialog({ isOpen, onClose, onSuccess }) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="utgående"
+              checked={form.utgående}
+              onCheckedChange={(checked) => setForm({ ...form, utgående: !!checked })}
+            />
+            <label htmlFor="utgående" className="text-sm font-semibold cursor-pointer">
+              Utgående artikel (köps inte längre in)
+            </label>
           </div>
 
           <div className="flex gap-2 pt-4">

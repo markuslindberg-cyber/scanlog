@@ -19,6 +19,7 @@ export default function Lager() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [dataLimit, setDataLimit] = useState(100);
+  const [filterTyp, setFilterTyp] = useState('alla');
   const fileInputRef = useRef(null);
 
   const loadData = async (limit = dataLimit) => {
@@ -159,10 +160,15 @@ export default function Lager() {
     };
   });
 
-  const filtered = unikArtiklar.filter(a =>
-    a.benämning.toLowerCase().includes(search.toLowerCase()) ||
-    a.streckkod.includes(search)
-  );
+  const filtered = unikArtiklar.filter(a => {
+    const matchSearch = a.benämning.toLowerCase().includes(search.toLowerCase()) || a.streckkod.includes(search);
+    if (!matchSearch) return false;
+    if (filterTyp === 'ejILager') return calculateSaldo(a) === 0;
+    if (filterTyp === 'utgående') return !!a.utgående;
+    return true;
+  });
+
+  const totaltLagervärde = unikArtiklar.reduce((sum, a) => sum + calculateSaldo(a) * a.pris, 0);
 
   const handleSort = (column) => {
     if (sortBy === column) {
@@ -271,6 +277,33 @@ export default function Lager() {
 
       <AddArtikelDialog isOpen={showDialog} onClose={() => setShowDialog(false)} onSuccess={() => { setShowDialog(false); loadData(); }} />
 
+      {/* Totalt lagervärde */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center justify-between">
+        <span className="text-sm text-blue-700 font-medium">Totalt lagervärde ({sorted.length} artiklar)</span>
+        <span className="text-xl font-bold text-blue-900">{totaltLagervärde.toFixed(2)} kr</span>
+      </div>
+
+      {/* Filterflikar */}
+      <div className="flex gap-1">
+        {[
+          { key: 'alla', label: 'Alla artiklar' },
+          { key: 'ejILager', label: `Slut i lager (${tomma})` },
+          { key: 'utgående', label: 'Utgående' }
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setFilterTyp(key)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              filterTyp === key
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Status badges */}
       {(tomma > 0 || lågtSaldo > 0) && (
         <div className="flex gap-2 flex-wrap">
@@ -351,8 +384,7 @@ export default function Lager() {
                 return (
                   <tr
                     key={artikel.id}
-                    className={`${saldoBg} ${editingId !== artikel.id ? 'cursor-pointer hover:bg-blue-50' : ''} transition-colors`}
-                    onClick={() => editingId !== artikel.id && handleRowClick(artikel.streckkod)}
+                    className={`${saldoBg} transition-colors hover:bg-blue-50`}
                   >
                     {editingId === artikel.id ? (
                       <>
@@ -397,7 +429,15 @@ export default function Lager() {
                       <>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium">{artikel.benämning}</p>
+                            <button
+                              onClick={() => handleRowClick(artikel.streckkod)}
+                              className="font-medium text-left hover:text-blue-600 hover:underline transition-colors"
+                            >
+                              {artikel.benämning}
+                            </button>
+                            {artikel.utgående && (
+                              <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-medium flex-shrink-0">Utgående</span>
+                            )}
                             <button
                               onClick={(e) => handleEditClick(e, artikel)}
                               className="text-blue-600 hover:bg-blue-50 p-1 rounded ml-2 flex-shrink-0"

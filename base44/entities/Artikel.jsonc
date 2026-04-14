@@ -31,6 +31,11 @@
       "type": "integer",
       "description": "Varning n\u00e4r saldo understiger detta",
       "default": 10
+    },
+    "utg\u00e5ende": {
+      "type": "boolean",
+      "description": "Markerar artiklar som inte l\u00e4ngre k\u00f6ps in",
+      "default": false
     }
   },
   "required": [
