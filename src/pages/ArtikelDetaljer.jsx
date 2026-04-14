@@ -28,8 +28,8 @@ export default function ArtikelDetaljer() {
   const loadData = async () => {
     try {
       const [artiklarData, uttagData, personalData, kundarData, inköpData] = await Promise.all([
-        base44.entities.Artikel.list(),
-        base44.entities.Uttag.list(),
+        base44.entities.Artikel.list(null, dataLimit),
+        base44.entities.Uttag.list(null, dataLimit),
         base44.entities.Personal.list(),
         base44.entities.Kund.list(),
         base44.entities.Inköp.list()
